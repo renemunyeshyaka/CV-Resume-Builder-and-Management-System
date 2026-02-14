@@ -1,0 +1,365 @@
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import axios from 'axios';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
+export default function CVPreview() {
+  const router = useRouter();
+  const { id } = router.query;
+  const [cv, setCV] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!id) return;
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      router.push('/login');
+      return;
+    }
+
+    fetchCV(token, id);
+  }, [id]);
+
+  const fetchCV = async (token, cvId) => {
+    try {
+      const response = await axios.get(`${API_URL}/api/cv/${cvId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setCV(response.data);
+      setLoading(false);
+    } catch (err) {
+      setError('Failed to load CV preview');
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', fontSize: '18px', color: '#667eea' }}>
+        Loading CV preview...
+      </div>
+    );
+  }
+
+  if (error || !cv) {
+    return (
+      <div style={{ padding: '40px', textAlign: 'center' }}>
+        <h2>{error || 'CV not found'}</h2>
+        <button
+          onClick={() => router.push('/my-cvs')}
+          style={{
+            padding: '10px 20px',
+            background: '#667eea',
+            color: 'white',
+            border: 'none',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            fontSize: '14px',
+            fontWeight: '600'
+          }}
+        >
+          Back to My CVs
+        </button>
+      </div>
+    );
+  }
+
+  const content = cv.content;
+
+  return (
+    <div style={{ minHeight: '100vh', background: '#f8f9fa', padding: '30px 20px' }}>
+      <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+        {/* Header Controls */}
+        <div style={{ marginBottom: '30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h1 style={{ fontSize: '28px', fontWeight: '700', color: '#333', margin: 0 }}>
+            📋 Preview - {cv.title}
+          </h1>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button
+              onClick={() => router.push('/my-cvs')}
+              style={{
+                padding: '10px 20px',
+                background: '#e8e8e8',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '600',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseOver={(e) => e.target.style.background = '#d8d8d8'}
+              onMouseOut={(e) => e.target.style.background = '#e8e8e8'}
+            >
+              Back
+            </button>
+            <button
+              onClick={() => window.print()}
+              style={{
+                padding: '10px 20px',
+                background: '#667eea',
+                color: 'white',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '600',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseOver={(e) => e.target.style.background = '#5568d3'}
+              onMouseOut={(e) => e.target.style.background = '#667eea'}
+            >
+              🖨️ Print/Save as PDF
+            </button>
+          </div>
+        </div>
+
+        {/* CV Document */}
+        <div
+          style={{
+            background: 'white',
+            padding: '60px 40px',
+            borderRadius: '10px',
+            boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+            lineHeight: '1.6',
+            fontSize: '14px',
+            color: '#333'
+          }}
+        >
+          {/* Personal Header */}
+          <div style={{ textAlign: 'center', marginBottom: '40px', borderBottom: '2px solid #667eea', paddingBottom: '30px' }}>
+            <h1 style={{ fontSize: '32px', fontWeight: '700', margin: '0 0 10px 0', color: '#667eea' }}>
+              {content?.fullName || 'Your Name'}
+            </h1>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', flexWrap: 'wrap', fontSize: '13px', color: '#666' }}>
+              {content?.email && <span>📧 {content.email}</span>}
+              {content?.phone && <span>📱 {content.phone}</span>}
+              {content?.location && <span>📍 {content.location}</span>}
+            </div>
+          </div>
+
+          {/* Professional Summary */}
+          {content?.summary && (
+            <div style={{ marginBottom: '35px' }}>
+              <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#667eea', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                Professional Summary
+              </h2>
+              <p style={{ margin: '0', color: '#555', lineHeight: '1.8' }}>
+                {content.summary}
+              </p>
+            </div>
+          )}
+
+          {/* Experience */}
+          {content?.experience && content.experience.length > 0 && (
+            <div style={{ marginBottom: '35px' }}>
+              <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#667eea', marginBottom: '15px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                Work Experience
+              </h2>
+              {content.experience.map((exp, idx) => (
+                exp.company && (
+                  <div key={idx} style={{ marginBottom: '20px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '5px' }}>
+                      <h3 style={{ margin: '0', fontWeight: '700', fontSize: '15px' }}>
+                        {exp.position}
+                      </h3>
+                      <span style={{ fontSize: '12px', color: '#999' }}>
+                        {exp.duration}
+                      </span>
+                    </div>
+                    <p style={{ margin: '0 0 8px 0', color: '#667eea', fontWeight: '600', fontSize: '13px' }}>
+                      {exp.company}
+                    </p>
+                    <p style={{ margin: '0', color: '#555', fontSize: '13px', whiteSpace: 'pre-wrap' }}>
+                      {exp.description}
+                    </p>
+                  </div>
+                )
+              ))}
+            </div>
+          )}
+
+          {/* Education */}
+          {content?.education && content.education.length > 0 && (
+            <div style={{ marginBottom: '35px' }}>
+              <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#667eea', marginBottom: '15px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                Education
+              </h2>
+              {content.education.map((edu, idx) => (
+                edu.institution && (
+                  <div key={idx} style={{ marginBottom: '15px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '5px' }}>
+                      <h3 style={{ margin: '0', fontWeight: '700', fontSize: '15px' }}>
+                        {edu.degree} in {edu.field}
+                      </h3>
+                      <span style={{ fontSize: '12px', color: '#999' }}>
+                        {edu.year}
+                      </span>
+                    </div>
+                    <p style={{ margin: '0', color: '#667eea', fontWeight: '600', fontSize: '13px' }}>
+                      {edu.institution}
+                    </p>
+                  </div>
+                )
+              ))}
+            </div>
+          )}
+
+          {/* Skills */}
+          {content?.skills && content.skills.length > 0 && (
+            <div style={{ marginBottom: '35px' }}>
+              <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#667eea', marginBottom: '15px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                Skills
+              </h2>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                {content.skills.map((skill, idx) => (
+                  skill.skill && (
+                    <div
+                      key={idx}
+                      style={{
+                        background: '#f0f4ff',
+                        border: '1px solid #667eea',
+                        padding: '8px 12px',
+                        borderRadius: '20px',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        color: '#667eea'
+                      }}
+                    >
+                      {skill.skill} • {skill.proficiency}
+                    </div>
+                  )
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Projects */}
+          {content?.projects && content.projects.length > 0 && (
+            <div style={{ marginBottom: '35px' }}>
+              <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#667eea', marginBottom: '15px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                Projects
+              </h2>
+              {content.projects.map((proj, idx) => (
+                proj.title && (
+                  <div key={idx} style={{ marginBottom: '15px' }}>
+                    <h3 style={{ margin: '0 0 5px 0', fontWeight: '700', fontSize: '15px' }}>
+                      {proj.title}
+                    </h3>
+                    <p style={{ margin: '0 0 8px 0', color: '#555', fontSize: '13px', whiteSpace: 'pre-wrap' }}>
+                      {proj.description}
+                    </p>
+                    {proj.link && (
+                      <p style={{ margin: '0', fontSize: '12px', color: '#667eea' }}>
+                        🔗 {proj.link}
+                      </p>
+                    )}
+                  </div>
+                )
+              ))}
+            </div>
+          )}
+
+          {/* Certifications */}
+          {content?.certifications && content.certifications.length > 0 && (
+            <div style={{ marginBottom: '35px' }}>
+              <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#667eea', marginBottom: '15px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                Certifications
+              </h2>
+              {content.certifications.map((cert, idx) => (
+                cert.name && (
+                  <div key={idx} style={{ marginBottom: '10px', fontSize: '13px' }}>
+                    <strong>{cert.name}</strong> • {cert.issuer}
+                    {cert.date && <span> • {cert.date}</span>}
+                  </div>
+                )
+              ))}
+            </div>
+          )}
+
+          {/* Languages */}
+          {content?.languages && content.languages.length > 0 && (
+            <div>
+              <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#667eea', marginBottom: '15px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                Languages
+              </h2>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
+                {content.languages.map((lang, idx) => (
+                  lang.language && (
+                    <div key={idx} style={{ fontSize: '13px' }}>
+                      <strong>{lang.language}</strong> • {lang.proficiency}
+                    </div>
+                  )
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Footer Actions */}
+        <div style={{ marginTop: '30px', textAlign: 'center' }}>
+          <button
+            onClick={() => router.push(`/cv/${id}`)}
+            style={{
+              padding: '12px 30px',
+              background: '#667eea',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: '600',
+              marginRight: '10px',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseOver={(e) => e.target.style.background = '#5568d3'}
+            onMouseOut={(e) => e.target.style.background = '#667eea'}
+          >
+            ✏️ Edit CV
+          </button>
+          <button
+            onClick={() => router.push('/my-cvs')}
+            style={{
+              padding: '12px 30px',
+              background: '#e8e8e8',
+              color: '#333',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: '600',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseOver={(e) => e.target.style.background = '#d8d8d8'}
+            onMouseOut={(e) => e.target.style.background = '#e8e8e8'}
+          >
+            Back to My CVs
+          </button>
+        </div>
+      </div>
+
+      {/* Print Styles */}
+      <style>{`
+        @media print {
+          body {
+            background: white;
+            margin: 0;
+            padding: 0;
+          }
+          div[style*="maxWidth: 900px"] {
+            box-shadow: none;
+            max-width: 100%;
+          }
+          button {
+            display: none !important;
+          }
+          div[style*="marginTop: 30px"] {
+            display: none;
+          }
+        }
+      `}</style>
+    </div>
+  );
+}
