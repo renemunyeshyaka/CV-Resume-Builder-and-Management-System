@@ -5,6 +5,7 @@ const Home = () => {
   const canvasRef = useRef(null);
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     // Handle responsive state
@@ -173,38 +174,98 @@ const Home = () => {
       right: 0,
       background: 'rgba(102, 126, 234, 0.95)',
       backdropFilter: 'blur(10px)',
-      padding: isMobile ? '12px 15px' : '15px 30px',
+      padding: isMobile ? '12px 15px' : isTablet ? '14px 20px' : '15px 30px',
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
       boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
       zIndex: 100,
-      flexWrap: isMobile ? 'wrap' : 'nowrap'
+      minHeight: isMobile ? '50px' : isTablet ? '55px' : '60px'
     },
     navBrand: {
-      fontSize: isMobile ? '1.2rem' : '1.5rem',
+      fontSize: isMobile ? '1.1rem' : isTablet ? '1.3rem' : '1.5rem',
       fontWeight: 'bold',
       color: '#fff',
       textDecoration: 'none',
-      cursor: 'pointer'
+      cursor: 'pointer',
+      whiteSpace: 'nowrap'
     },
     navLinks: {
-      display: 'flex',
-      gap: isMobile ? '10px' : '25px',
-      alignItems: 'center',
-      flexWrap: isMobile ? 'wrap' : 'nowrap'
+      display: isMobile || isTablet ? 'none' : 'flex',
+      gap: '25px',
+      alignItems: 'center'
     },
     navLink: {
       color: '#fff',
       textDecoration: 'none',
-      fontSize: isMobile ? '0.8rem' : '0.95rem',
+      fontSize: '0.95rem',
+      transition: 'opacity 0.3s',
+      cursor: 'pointer',
+      whiteSpace: 'nowrap'
+    },
+    hamburgerBtn: {
+      display: isMobile || isTablet ? 'flex' : 'none',
+      flexDirection: 'column',
+      background: 'none',
+      border: 'none',
+      cursor: 'pointer',
+      gap: '5px',
+      padding: '5px',
+      zIndex: 101
+    },
+    hamburgerLine: {
+      width: '24px',
+      height: '3px',
+      background: '#fff',
+      borderRadius: '2px',
+      transition: 'all 0.3s',
+      transformOrigin: 'center'
+    },
+    mobileMenu: {
+      position: 'fixed',
+      top: isMobile ? '50px' : isTablet ? '55px' : '60px',
+      left: 0,
+      right: 0,
+      background: 'rgba(102, 126, 234, 0.98)',
+      backdropFilter: 'blur(10px)',
+      display: menuOpen ? 'flex' : 'none',
+      flexDirection: 'column',
+      padding: isMobile ? '15px' : isTablet ? '18px' : '20px',
+      gap: isMobile ? '12px' : isTablet ? '14px' : '16px',
+      zIndex: 99,
+      maxHeight: 'calc(100vh - ' + (isMobile ? '50px' : isTablet ? '55px' : '60px') + ')',
+      overflowY: 'auto',
+      boxShadow: '0 4px 15px rgba(0,0,0,0.2)'
+    },
+    mobileLink: {
+      color: '#fff',
+      textDecoration: 'none',
+      fontSize: isMobile ? '0.95rem' : isTablet ? '1rem' : '1.05rem',
+      padding: isMobile ? '10px 0' : isTablet ? '12px 0' : '14px 0',
+      borderBottom: '1px solid rgba(255,255,255,0.2)',
       transition: 'opacity 0.3s',
       cursor: 'pointer'
+    },
+    mobileButtonGroup: {
+      display: 'flex',
+      gap: '10px',
+      marginTop: '10px',
+      flexDirection: 'column'
+    },
+    mobileButton: {
+      padding: isMobile ? '10px 20px' : isTablet ? '12px 25px' : '14px 30px',
+      fontSize: isMobile ? '0.9rem' : isTablet ? '0.95rem' : '1rem',
+      fontWeight: 'bold',
+      border: 'none',
+      borderRadius: '6px',
+      cursor: 'pointer',
+      transition: 'all 0.3s',
+      width: '100%'
     },
     container: {
       minHeight: '100vh',
       background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      padding: isMobile ? '100px 15px 0 15px' : isTablet ? '110px 20px 0 20px' : '120px 20px 0 20px',
+      padding: isMobile ? '70px 15px 0 15px' : isTablet ? '85px 20px 0 20px' : '120px 20px 0 20px',
       fontFamily: 'Arial, sans-serif',
       position: 'relative',
       zIndex: 1,
@@ -395,6 +456,98 @@ const Home = () => {
       transition: 'opacity 0.3s',
       cursor: 'pointer',
       fontSize: isMobile ? '0.75rem' : 'inherit'
+    },
+    contactSection: {
+      maxWidth: '1000px',
+      margin: isMobile ? '60px auto 80px' : isTablet ? '80px auto 80px' : '100px auto 80px',
+      padding: isMobile ? '30px 20px' : isTablet ? '40px 30px' : '50px 40px',
+      background: 'rgba(255,255,255,0.95)',
+      borderRadius: '15px',
+      boxShadow: '0 10px 40px rgba(0,0,0,0.2)',
+      backdropFilter: 'blur(10px)'
+    },
+    contactTitle: {
+      fontSize: isMobile ? '1.8rem' : isTablet ? '2.2rem' : '2.5rem',
+      fontWeight: 'bold',
+      color: '#667eea',
+      textAlign: 'center',
+      marginBottom: isMobile ? '20px' : isTablet ? '30px' : '40px'
+    },
+    contactContent: {
+      display: 'grid',
+      gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+      gap: isMobile ? '30px' : '40px'
+    },
+    contactForm: {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '15px'
+    },
+    contactInput: {
+      padding: '12px 15px',
+      fontSize: '0.95rem',
+      border: '2px solid #e0e0e0',
+      borderRadius: '8px',
+      fontFamily: 'Arial, sans-serif',
+      transition: 'border-color 0.3s',
+      outline: 'none',
+      '&:focus': {
+        borderColor: '#667eea'
+      }
+    },
+    contactTextarea: {
+      padding: '12px 15px',
+      fontSize: '0.95rem',
+      border: '2px solid #e0e0e0',
+      borderRadius: '8px',
+      fontFamily: 'Arial, sans-serif',
+      minHeight: '120px',
+      resize: 'vertical',
+      transition: 'border-color 0.3s',
+      outline: 'none'
+    },
+    contactSubmitBtn: {
+      padding: '12px 30px',
+      fontSize: '1rem',
+      fontWeight: 'bold',
+      border: 'none',
+      borderRadius: '8px',
+      background: '#667eea',
+      color: '#fff',
+      cursor: 'pointer',
+      transition: 'all 0.3s',
+      alignSelf: 'flex-start'
+    },
+    contactInfo: {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: isMobile ? '20px' : '30px'
+    },
+    contactInfoItem: {
+      display: 'flex',
+      alignItems: 'flex-start',
+      gap: '15px'
+    },
+    contactIcon: {
+      fontSize: '1.5rem',
+      color: '#667eea',
+      minWidth: '30px',
+      textAlign: 'center'
+    },
+    contactInfoText: {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '5px'
+    },
+    contactLabel: {
+      fontSize: '1rem',
+      fontWeight: 'bold',
+      color: '#333'
+    },
+    contactValue: {
+      fontSize: '0.95rem',
+      color: '#666',
+      lineHeight: '1.6'
     }
   };
 
@@ -410,7 +563,15 @@ const Home = () => {
         <Link href="/">
           <span style={styles.navBrand}>CV Builder</span>
         </Link>
+        
+        {/* Desktop Navigation */}
         <div style={styles.navLinks}>
+          <Link href="/" style={styles.navLink}
+            onMouseEnter={(e) => e.target.style.opacity = '0.7'}
+            onMouseLeave={(e) => e.target.style.opacity = '1'}
+          >
+            Home
+          </Link>
           <a 
             href="#features" 
             style={styles.navLink}
@@ -427,17 +588,108 @@ const Home = () => {
           >
             How It Works
           </a>
+          <a 
+            href="#contact" 
+            style={styles.navLink}
+            onMouseEnter={(e) => e.target.style.opacity = '0.7'}
+            onMouseLeave={(e) => e.target.style.opacity = '1'}
+          >
+            Contact Us
+          </a>
           <Link href="/login-otp">
-            <button 
+            <span 
               style={{...styles.button, ...styles.secondaryBtn}}
               onMouseEnter={(e) => Object.assign(e.target.style, styles.buttonHover)}
               onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
             >
               Login
+            </span>
+          </Link>
+          <Link href="/register">
+            <span 
+              style={{...styles.button, ...styles.primaryBtn}}
+              onMouseEnter={(e) => Object.assign(e.target.style, styles.buttonHover)}
+              onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
+            >
+              Register
+            </span>
+          </Link>
+        </div>
+
+        {/* Hamburger Menu Button */}
+        <button 
+          style={styles.hamburgerBtn}
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label="Toggle menu"
+        >
+          <span 
+            style={{
+              ...styles.hamburgerLine,
+              transform: menuOpen ? 'rotate(45deg) translateY(11px)' : 'rotate(0)'
+            }}
+          ></span>
+          <span 
+            style={{
+              ...styles.hamburgerLine,
+              opacity: menuOpen ? '0' : '1'
+            }}
+          ></span>
+          <span 
+            style={{
+              ...styles.hamburgerLine,
+              transform: menuOpen ? 'rotate(-45deg) translateY(-11px)' : 'rotate(0)'
+            }}
+          ></span>
+        </button>
+      </nav>
+
+      {/* Mobile/Tablet Dropdown Menu */}
+      <div style={styles.mobileMenu}>
+        <Link href="/" style={styles.mobileLink} onClick={() => setMenuOpen(false)}>
+          Home
+        </Link>
+        <a 
+          href="#features" 
+          style={styles.mobileLink}
+          onClick={() => setMenuOpen(false)}
+        >
+          Features
+        </a>
+        <a 
+          href="#how-it-works" 
+          style={styles.mobileLink}
+          onClick={() => setMenuOpen(false)}
+        >
+          How It Works
+        </a>
+        <a 
+          href="#contact" 
+          style={styles.mobileLink}
+          onClick={() => setMenuOpen(false)}
+        >
+          Contact Us
+        </a>
+        <div style={styles.mobileButtonGroup}>
+          <Link href="/login-otp" onClick={() => setMenuOpen(false)}>
+            <button 
+              style={{...styles.mobileButton, ...styles.secondaryBtn}}
+              onMouseEnter={(e) => e.target.style.opacity = '0.8'}
+              onMouseLeave={(e) => e.target.style.opacity = '1'}
+            >
+              Login
+            </button>
+          </Link>
+          <Link href="/register" onClick={() => setMenuOpen(false)}>
+            <button 
+              style={{...styles.mobileButton, ...styles.primaryBtn}}
+              onMouseEnter={(e) => e.target.style.opacity = '0.9'}
+              onMouseLeave={(e) => e.target.style.opacity = '1'}
+            >
+              Register
             </button>
           </Link>
         </div>
-      </nav>
+      </div>
 
       <div style={styles.container}>
         {/* Header */}
@@ -520,30 +772,117 @@ const Home = () => {
           </div>
         </div>
 
+        {/* Contact Us Section */}
+        <div style={styles.contactSection} id="contact">
+          <h2 style={styles.contactTitle}>Get in Touch</h2>
+          <div style={styles.contactContent}>
+            <form style={styles.contactForm} onSubmit={(e) => {
+              e.preventDefault();
+              alert('Thank you for your message! We will get back to you soon.');
+            }}>
+              <input
+                type="text"
+                placeholder="Your Name"
+                style={styles.contactInput}
+                onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                onBlur={(e) => e.target.style.borderColor = '#e0e0e0'}
+                required
+              />
+              <input
+                type="email"
+                placeholder="Your Email"
+                style={styles.contactInput}
+                onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                onBlur={(e) => e.target.style.borderColor = '#e0e0e0'}
+                required
+              />
+              <input
+                type="text"
+                placeholder="Subject"
+                style={styles.contactInput}
+                onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                onBlur={(e) => e.target.style.borderColor = '#e0e0e0'}
+                required
+              />
+              <textarea
+                placeholder="Your Message"
+                style={styles.contactTextarea}
+                onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                onBlur={(e) => e.target.style.borderColor = '#e0e0e0'}
+                required
+              ></textarea>
+              <button
+                type="submit"
+                style={styles.contactSubmitBtn}
+                onMouseEnter={(e) => {
+                  e.target.style.background = '#764ba2';
+                  e.target.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = '#667eea';
+                  e.target.style.transform = 'translateY(0)';
+                }}
+              >
+                Send Message
+              </button>
+            </form>
+
+            <div style={styles.contactInfo}>
+              <div style={styles.contactInfoItem}>
+                <div style={styles.contactIcon}>📧</div>
+                <div style={styles.contactInfoText}>
+                  <span style={styles.contactLabel}>Email</span>
+                  <span style={styles.contactValue}>support@cvbuilder.com</span>
+                </div>
+              </div>
+
+              <div style={styles.contactInfoItem}>
+                <div style={styles.contactIcon}>📱</div>
+                <div style={styles.contactInfoText}>
+                  <span style={styles.contactLabel}>Phone</span>
+                  <span style={styles.contactValue}>+250 788 620 201</span>
+                </div>
+              </div>
+
+              <div style={styles.contactInfoItem}>
+                <div style={styles.contactIcon}>📍</div>
+                <div style={styles.contactInfoText}>
+                  <span style={styles.contactLabel}>Address</span>
+                  <span style={styles.contactValue}>Kigali, Rwanda</span>
+                </div>
+              </div>
+
+              <div style={styles.contactInfoItem}>
+                <div style={styles.contactIcon}>🕐</div>
+                <div style={styles.contactInfoText}>
+                  <span style={styles.contactLabel}>Business Hours</span>
+                  <span style={styles.contactValue}>Monday - Friday: 9:00 AM - 6:00 PM (EAT)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Footer */}
         <footer style={styles.footer}>
           <p style={styles.footerText}>
             © 2026 CV/Resume Builder and Management System. All rights reserved.
           </p>
           <div style={styles.footerLinks}>
-            <a 
-              href="#" 
-              style={styles.footerLink}
+            <Link href="/privacy-policy" style={styles.footerLink}
               onMouseEnter={(e) => e.target.style.opacity = '0.7'}
               onMouseLeave={(e) => e.target.style.opacity = '0.9'}
             >
               Privacy Policy
-            </a>
-            <a 
-              href="#" 
-              style={styles.footerLink}
+            </Link>
+            <Link href="/terms-of-service" style={styles.footerLink}
               onMouseEnter={(e) => e.target.style.opacity = '0.7'}
               onMouseLeave={(e) => e.target.style.opacity = '0.9'}
             >
               Terms of Service
-            </a>
+            </Link>
             <a 
-              href="#" 
+              href="#contact" 
               style={styles.footerLink}
               onMouseEnter={(e) => e.target.style.opacity = '0.7'}
               onMouseLeave={(e) => e.target.style.opacity = '0.9'}

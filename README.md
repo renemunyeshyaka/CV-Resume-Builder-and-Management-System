@@ -215,3 +215,9 @@ This project is open-source and available under the MIT License.
 ## Contact
 
 For support or inquiries, please contact [munyeshyaka@hotmail.com, WhatsApp and Telegram: +250788620201].
+
+# Watch both apps
+pm2 monit
+
+# View logs
+pm2 logs
