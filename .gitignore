@@ -4,46 +4,42 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 package-lock.json
-yarn.lock
+## Node
+node_modules/
+**/node_modules/
 
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-venv/
-env/
-ENV/
-.venv
-
-# IDEs and Editors
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-.DS_Store
-
-# Build outputs
-dist/
-build/
-*.egg-info/
-.next/
-out/
-
-# Environment variables
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Logs
+## Logs
 logs/
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Database
+## Environment
+# Never commit env files with secrets; keep the example tracked
+.env
+.env.local
+.env.*.local
+.env.production
+backend/.env
+frontend/.env
+!.env.example
+
+## Build outputs
+dist/
+build/
+.next/
+out/
+frontend/.next/
+frontend/out/
+
+## Uploads and temporary files
+uploads/
+public/uploads/
+temp/
+tmp/
+
+## Databases and backups
 *.db
 *.sqlite
 *.sqlite3
@@ -52,21 +48,25 @@ backup.sql
 backup*.sql
 backup*.dump
 
-# Uploads (user resume/CV files)
-uploads/
-temp/
-public/uploads/
-
-# OS files
-Thumbs.db
+## IDEs and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
 .DS_Store
 
-# Testing
+## PM2 / Process managers
+.pm2/
+ecosystem.config.js
+
+## Coverage / test artifacts
 coverage/
 .nyc_output/
 .pytest_cache/
 
-# Misc
+## Misc
 .cache/
-*.bak
 *.tmp
+*.bak
+Thumbs.db

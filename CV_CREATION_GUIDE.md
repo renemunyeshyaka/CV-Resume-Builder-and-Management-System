@@ -1,5 +1,7 @@
 # CV Creation System - Professional Guide
 
+Last updated: 2026-02-16
+
 ## Overview
 The enhanced CV creation system provides a structured, professional approach to building CVs. Users can now create comprehensive, well-organized resumes with multiple sections and professional guidance.
 

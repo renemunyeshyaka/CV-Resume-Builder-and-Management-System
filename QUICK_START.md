@@ -1,5 +1,7 @@
 # 🚀 Quick Start Guide - Professional CV Creation
 
+Last updated: 2026-02-16
+
 ## What's New?
 
 Your CV/Resume Builder now has a **professional-grade CV creation system** with:
