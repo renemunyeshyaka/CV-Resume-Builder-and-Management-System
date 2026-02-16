@@ -1,5 +1,7 @@
 # CV/Resume Builder and Management System
 
+Last updated: 2026-02-16
+
 ## Overview
 
 The CV/Resume Builder and Management System is a modern, fully responsive web application that allows users to create, update, and secure their professional resumes effortlessly. The system features a professional-grade CV editor with multiple sections, profile management, electronic signature support, and secure PDF generation. Built with a mobile-first approach, it works seamlessly across all devices including PDAs, smartphones, tablets, and desktops. The system also incorporates QR codes and barcodes for document verification and anti-forgery measures.
@@ -150,8 +152,8 @@ The CV/Resume Builder and Management System is a modern, fully responsive web ap
 
 ## Getting Started
 
-### Prerequisites
-- Node.js (v14 or higher)
+-### Prerequisites
+- Node.js (v16 or higher, LTS recommended)
 - PostgreSQL (v12 or higher)
 - npm or yarn package manager
 
@@ -177,24 +179,91 @@ The CV/Resume Builder and Management System is a modern, fully responsive web ap
 
 4. **Set up the database:**
    ```bash
-   psql -U postgres -f database/init.sql
+   psql -U postgres -f ../database/init.sql
    ```
 
 5. **Configure environment variables:**
-   - Create `.env` files in both backend and frontend directories
-   - Set database connection strings, JWT secrets, and API URLs
+   - Copy `.env.example` to `.env.local` in both backend and frontend directories
+   - Update with your local database credentials and API URLs
+   - See [ENVIRONMENT_SETUP.md](./ENVIRONMENT_SETUP.md) for detailed configuration
 
 ### Running the Application
 
 **Development Mode:**
-- Start backend: `cd backend && npm run dev`
-- Start frontend: `cd frontend && npm run dev`
-- Access the application at `http://localhost:3000`
+```bash
+# Terminal 1: Backend
+cd backend
+npm run dev:local
 
-**Production Mode:**
-- Build frontend: `cd frontend && npm run build`
-- Start frontend: `cd frontend && npm start`
-- Start backend: `cd backend && npm start`
+# Terminal 2: Frontend (new terminal)
+cd frontend
+npm run dev:local
+```
+Access the application at `http://localhost:3000`
+
+**Production Mode (Local Testing):**
+```bash
+# Terminal 1: Backend
+cd backend
+npm run prod:local
+
+# Terminal 2: Frontend
+cd frontend
+npm run prod:local
+```
+
+### Environment Configuration
+
+This project uses environment-based configuration for seamless deployment across development and production environments.
+
+**Environment Files:**
+- `.env.local` - Development environment (git-ignored, local only)
+- `.env.production` - Production environment template (git-ignored, for VPS deployment)
+- `.env.example` - Template for developers (git-tracked, documentation only)
+
+**Key Environment Variables:**
+
+**Backend:**
+- `NODE_ENV` - Environment mode (development/production)
+- `PORT` - Backend server port (default: 5000)
+- `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` - Database credentials
+- `BACKEND_URL` - Public backend URL (used in emails)
+- `FRONTEND_URL` - Public frontend URL (used in emails and redirects)
+- `JWT_SECRET` - Secret key for JWT tokens
+- `SMTP_*` - Email service configuration
+
+**Frontend:**
+- `NEXT_PUBLIC_API_URL` - Backend API endpoint
+- `NEXT_PUBLIC_FRONTEND_URL` - Frontend public URL
+- `NEXT_PUBLIC_NODE_ENV` - Environment mode (must start with NEXT_PUBLIC_)
+- `NEXT_PUBLIC_ENABLE_DEBUG` - Enable debug mode
+- `NEXT_PUBLIC_ENABLE_ANALYTICS` - Enable analytics
+
+See [ENVIRONMENT_SETUP.md](./ENVIRONMENT_SETUP.md) for comprehensive setup instructions.
+
+## Deployment
+
+### Local Development Deployment
+```bash
+# Backend
+cd backend && npm run dev:local
+
+# Frontend (separate terminal)
+cd frontend && npm run dev:local
+```
+
+### Production Deployment on Namecheap VPS
+Comprehensive deployment instructions are available in [NAMECHEAP_DEPLOYMENT.md](./NAMECHEAP_DEPLOYMENT.md).
+
+Quick steps:
+1. SSH into your Namecheap VPS
+2. Clone the repository
+3. Create `.env.production` files with your VPS credentials
+4. Initialize database: `psql -p 5433 < database/init.sql`
+5. Install PM2 globally: `sudo npm install -g pm2`
+6. Start services: `pm2 start backend/src/index.js` and `pm2 start npm -- start` (frontend)
+7. Configure Nginx reverse proxy for HTTPS
+8. Set up SSL with Let's Encrypt
 
 ## Future Enhancements
 
