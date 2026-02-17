@@ -48,6 +48,12 @@ backup.sql
 backup*.sql
 backup*.dump
 
+## Sensitive database commands and queries
+*kcoduyxv*
+*.sql.query
+*db_query*
+*database_query*
+
 ## IDEs and editors
 .vscode/
 .idea/
