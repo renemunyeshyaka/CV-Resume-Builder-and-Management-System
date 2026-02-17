@@ -10,6 +10,8 @@ export default function CVPreview() {
   const [cv, setCV] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [signing, setSigning] = useState(false);
+  const [signMessage, setSignMessage] = useState('');
 
   useEffect(() => {
     if (!id) return;
@@ -28,6 +30,8 @@ export default function CVPreview() {
       const response = await axios.get(`${API_URL}/api/cv/${cvId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
+      console.log('CV Data received:', response.data);
+      console.log('Profile Picture:', response.data.profile_picture);
       setCV(response.data);
       setLoading(false);
     } catch (err) {
@@ -35,6 +39,31 @@ export default function CVPreview() {
       setLoading(false);
     }
   };
+
+  const handleSignCV = async () => {
+    setSigning(true);
+    setSignMessage('');
+    const token = localStorage.getItem('token');
+
+    try {
+      const response = await axios.post(
+        `${API_URL}/api/cv/${id}/sign`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      setSignMessage('✓ CV signed successfully with QR code, barcode, and watermark!');
+      // Refresh CV data to show signed status
+      await fetchCV(token, id);
+    } catch (err) {
+      setSignMessage('✗ Failed to sign CV: ' + (err.response?.data?.error || err.message));
+    } finally {
+      setSigning(false);
+    }
+  };
+
 
   if (loading) {
     return (
@@ -69,15 +98,49 @@ export default function CVPreview() {
 
   const content = cv.content;
 
+  // Generate avatar based on name
+  const getAvatarColor = (name) => {
+    const colors = ['#667eea', '#f093fb', '#4facfe', '#43e97b', '#fa709a', '#fee140', '#30b0fe', '#ec4899'];
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return colors[Math.abs(hash) % colors.length];
+  };
+
+  // Determine profile picture (real or avatar)
+  const fullName = content?.fullName || cv.name || 'User';
+  const profilePicture = cv.profile_picture;
+  const initials = fullName
+    .split(' ')
+    .map(n => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+
+  const avatarColor = getAvatarColor(fullName);
+  const formattedDateTime = new Date().toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+
   return (
     <div style={{ minHeight: '100vh', background: '#f8f9fa', padding: '30px 20px' }}>
       <div style={{ maxWidth: '900px', margin: '0 auto' }}>
         {/* Header Controls */}
-        <div style={{ marginBottom: '30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ marginBottom: '30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '15px' }}>
           <h1 style={{ fontSize: '28px', fontWeight: '700', color: '#333', margin: 0 }}>
             📋 Preview - {cv.title}
+            {cv.status === 'signed' && (
+              <span style={{ marginLeft: '15px', fontSize: '14px', color: '#10b981', fontWeight: '600', background: '#d1fae5', padding: '5px 12px', borderRadius: '20px' }}>
+                ✓ Signed
+              </span>
+            )}
           </h1>
-          <div style={{ display: 'flex', gap: '10px' }}>
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
             <button
               onClick={() => router.push('/my-cvs')}
               style={{
@@ -96,6 +159,27 @@ export default function CVPreview() {
             >
               Back
             </button>
+            {cv.status !== 'signed' && (
+              <button
+                onClick={handleSignCV}
+                disabled={signing}
+                style={{
+                  padding: '10px 20px',
+                  background: signing ? '#9ca3af' : '#10b981',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: signing ? 'not-allowed' : 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseOver={(e) => !signing && (e.target.style.background = '#059669')}
+                onMouseOut={(e) => !signing && (e.target.style.background = '#10b981')}
+              >
+                {signing ? '⏳ Signing...' : '✍️ Sign CV'}
+              </button>
+            )}
             <button
               onClick={() => window.print()}
               style={{
@@ -117,6 +201,22 @@ export default function CVPreview() {
           </div>
         </div>
 
+
+        {/* Sign Message */}
+        {signMessage && (
+          <div style={{
+            marginBottom: '20px',
+            padding: '15px 20px',
+            background: signMessage.includes('✓') ? '#d1fae5' : '#fee2e2',
+            color: signMessage.includes('✓') ? '#065f46' : '#991b1b',
+            borderRadius: '8px',
+            fontSize: '14px',
+            fontWeight: '600'
+          }}>
+            {signMessage}
+          </div>
+        )}
+
         {/* CV Document */}
         <div
           className="cv-print-document"
@@ -130,10 +230,54 @@ export default function CVPreview() {
             color: '#333'
           }}
         >
-          {/* Personal Header */}
+          {/* Personal Header with Photo */}
           <div style={{ textAlign: 'center', marginBottom: '40px', borderBottom: '2px solid #667eea', paddingBottom: '30px' }}>
+            {/* Profile Picture or Avatar */}
+            <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center' }}>
+              {profilePicture ? (
+                <img
+                  src={profilePicture.startsWith('http') ? profilePicture : `${API_URL}${profilePicture}`}
+                  alt={fullName}
+                  onError={(e) => {
+                    console.error('Profile image failed to load:', `${API_URL}${profilePicture}`);
+                    e.target.style.display = 'none';
+                  }}
+                  onLoad={() => {
+                    console.log('Profile image loaded successfully:', profilePicture);
+                  }}
+                  style={{
+                    width: '120px',
+                    height: '120px',
+                    borderRadius: '50%',
+                    objectFit: 'cover',
+                    border: '4px solid #667eea',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
+                  }}
+                />
+              ) : (
+                <div
+                  style={{
+                    width: '120px',
+                    height: '120px',
+                    borderRadius: '50%',
+                    background: avatarColor,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '48px',
+                    fontWeight: '700',
+                    color: 'white',
+                    border: '4px solid #667eea',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
+                  }}
+                >
+                  {initials}
+                </div>
+              )}
+            </div>
+            
             <h1 style={{ fontSize: '32px', fontWeight: '700', margin: '0 0 10px 0', color: '#667eea' }}>
-              {content?.fullName || 'Your Name'}
+              {fullName}
             </h1>
             <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', flexWrap: 'wrap', fontSize: '13px', color: '#666' }}>
               {content?.email && <span>📧 {content.email}</span>}
@@ -295,6 +439,10 @@ export default function CVPreview() {
                     </div>
                   )
                 ))}
+              </div>
+              <div style={{ marginTop: '16px', fontSize: '13px', color: '#555' }}>
+                <div><strong>Date & Time:</strong> {formattedDateTime}</div>
+                <div><strong>Full Name:</strong> {fullName}</div>
               </div>
             </div>
           )}

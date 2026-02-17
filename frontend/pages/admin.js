@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
 export default function Admin() {
   const [users, setUsers] = useState([]);
   const [error, setError] = useState('');
@@ -10,7 +12,7 @@ export default function Admin() {
     const t = localStorage.getItem('token');
     setToken(t);
     if (!t) return setError('Not authenticated');
-    axios.get('http://localhost:5000/api/admin/users', {
+    axios.get(`${API_URL}/api/admin/users`, {
       headers: { Authorization: `Bearer ${t}` }
     })
       .then(res => setUsers(res.data))
@@ -19,7 +21,7 @@ export default function Admin() {
 
   const handleActivate = async (id, active) => {
     try {
-      await axios.put(`http://localhost:5000/api/admin/users/${id}`, { active: !active }, {
+      await axios.put(`${API_URL}/api/admin/users/${id}`, { active: !active }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUsers(users.map(u => u.id === id ? { ...u, active: !active } : u));

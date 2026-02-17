@@ -269,7 +269,7 @@ export default router;
 router.get('/me', authenticateToken, async (req, res) => {
   try {
     const result = await pool.query(
-      'SELECT id, email, name, phone, location, occupation, bio, profile_picture, signature, role, created_at FROM users WHERE id = $1', 
+      'SELECT id, email, name, phone, location, occupation, bio, profile_picture, signature, role, active, created_at FROM users WHERE id = $1', 
       [req.user.id]
     );
     if (!result.rows[0]) return res.status(404).json({ error: 'User not found' });

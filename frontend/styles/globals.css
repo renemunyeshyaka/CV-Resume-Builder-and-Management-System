@@ -277,6 +277,17 @@ a:visited {
 
 /* ==================== PRINT STYLES ==================== */
 @media print {
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+
+  html, body, #__next {
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+
   body {
     background: white;
   }
@@ -284,6 +295,29 @@ a:visited {
   .profile-container {
     box-shadow: none;
     page-break-inside: avoid;
+  }
+
+  .cv-print-document {
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    page-break-inside: auto;
+    break-inside: auto;
+  }
+
+  .cv-print-document > div {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .cv-section {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .cv-item {
+    page-break-inside: avoid;
+    break-inside: avoid;
   }
 
   button, nav, .no-print {

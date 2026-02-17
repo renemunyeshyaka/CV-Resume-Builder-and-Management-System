@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
 export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -35,7 +37,7 @@ export default function Register() {
     if (Object.keys(errors).length) return;
     setLoading(true);
     try {
-      await axios.post('http://localhost:5000/api/auth/register', { email, password, name });
+      await axios.post(`${API_URL}/api/auth/register`, { email, password, name });
       setSuccess('Registration successful! You can now log in.');
       setEmail(''); setPassword(''); setName('');
       setAgreePrivacy(false);

@@ -22,6 +22,8 @@ export default function Profile() {
     bio: '',
     occupation: ''
   });
+  const [profileImageUrl, setProfileImageUrl] = useState(null);
+  const [signatureImageUrl, setSignatureImageUrl] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -46,8 +48,21 @@ export default function Profile() {
         bio: response.data.bio || '',
         occupation: response.data.occupation || ''
       });
+      // Set profile image preview
+      if (response.data.profile_picture) {
+        const imageUrl = `${API_URL}${response.data.profile_picture}`;
+        console.log('Setting profile image URL:', imageUrl);
+        setProfileImageUrl(imageUrl);
+      }
+      // Set signature image preview
+      if (response.data.signature) {
+        const signatureUrl = `${API_URL}${response.data.signature}`;
+        console.log('Setting signature URL:', signatureUrl);
+        setSignatureImageUrl(signatureUrl);
+      }
       setLoading(false);
     } catch (err) {
+      console.error('Profile fetch error:', err);
       setError('Failed to load profile');
       setLoading(false);
     }
@@ -273,10 +288,47 @@ export default function Profile() {
                 <p className={styles.mediaDescription}>
                   Upload a professional profile photo
                 </p>
+                
+                {/* Profile Picture Preview */}
+                {profileImageUrl && (
+                  <div style={{
+                    marginBottom: '20px',
+                    padding: '15px',
+                    backgroundColor: '#f9f9f9',
+                    borderRadius: '8px',
+                    textAlign: 'center'
+                  }}>
+                    <img
+                      src={profileImageUrl}
+                      alt="Profile"
+                      onError={(e) => {
+                        console.error('Profile image failed to load:', profileImageUrl);
+                        e.target.src = ''; // Clear on error
+                      }}
+                      onLoad={() => {
+                        console.log('Profile image loaded successfully');
+                      }}
+                      style={{
+                        maxWidth: '200px',
+                        maxHeight: '200px',
+                        borderRadius: '8px',
+                        border: '2px solid #667eea'
+                      }}
+                    />
+                    <p style={{ marginTop: '10px', fontSize: '12px', color: '#666' }}>
+                      Current Profile Picture
+                    </p>
+                  </div>
+                )}
+                
                 <FileUpload
                   label="Upload Photo"
                   endpoint="profile-picture"
                   field="profile_picture"
+                  onUploadSuccess={() => {
+                    const token = localStorage.getItem('token');
+                    fetchUserProfile(token);
+                  }}
                 />
               </div>
 
@@ -287,10 +339,47 @@ export default function Profile() {
                 <p className={styles.mediaDescription}>
                   Upload your signature image file
                 </p>
+                
+                {/* Signature Preview */}
+                {signatureImageUrl && (
+                  <div style={{
+                    marginBottom: '20px',
+                    padding: '15px',
+                    backgroundColor: '#f9f9f9',
+                    borderRadius: '8px',
+                    textAlign: 'center'
+                  }}>
+                    <img
+                      src={signatureImageUrl}
+                      alt="Signature"
+                      onError={(e) => {
+                        console.error('Signature image failed to load:', signatureImageUrl);
+                        e.target.src = '';
+                      }}
+                      onLoad={() => {
+                        console.log('Signature image loaded successfully');
+                      }}
+                      style={{
+                        maxWidth: '300px',
+                        maxHeight: '100px',
+                        borderRadius: '4px',
+                        border: '2px solid #667eea'
+                      }}
+                    />
+                    <p style={{ marginTop: '10px', fontSize: '12px', color: '#666' }}>
+                      Current Signature
+                    </p>
+                  </div>
+                )}
+                
                 <FileUpload
                   label="Upload Signature"
                   endpoint="signature"
                   field="signature"
+                  onUploadSuccess={() => {
+                    const token = localStorage.getItem('token');
+                    fetchUserProfile(token);
+                  }}
                 />
               </div>
             </div>

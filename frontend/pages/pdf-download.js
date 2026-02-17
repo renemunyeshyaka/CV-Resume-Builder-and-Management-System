@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
 export default function PDFDownload() {
   const [cvId, setCvId] = useState('');
   const [error, setError] = useState('');
@@ -11,7 +13,7 @@ export default function PDFDownload() {
     try {
       const token = localStorage.getItem('token');
       const res = await axios({
-        url: `http://localhost:5000/api/pdf/download/${cvId}`,
+        url: `${API_URL}/api/pdf/download/${cvId}`,
         method: 'GET',
         responseType: 'blob',
         headers: { Authorization: `Bearer ${token}` }

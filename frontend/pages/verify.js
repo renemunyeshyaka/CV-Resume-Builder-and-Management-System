@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
 export default function Verify() {
   const [cvId, setCvId] = useState('');
   const [result, setResult] = useState(null);
@@ -10,7 +12,7 @@ export default function Verify() {
     setError('');
     setResult(null);
     try {
-      const res = await axios.get(`http://localhost:5000/api/verify/${type}/${cvId}`);
+      const res = await axios.get(`${API_URL}/api/verify/${type}/${cvId}`);
       setResult(res.data);
     } catch {
       setError('Verification failed');

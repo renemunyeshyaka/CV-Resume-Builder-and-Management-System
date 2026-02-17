@@ -1,6 +1,7 @@
 -- Migration: Add active and activation_token columns to users table
 ALTER TABLE users ADD COLUMN IF NOT EXISTS active BOOLEAN DEFAULT FALSE;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS activation_token VARCHAR(255);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR(50) DEFAULT 'user';
 -- PostgreSQL initialization script for CV/Resume Builder
 -- Users table
 CREATE TABLE IF NOT EXISTS users (
@@ -16,6 +17,9 @@ CREATE TABLE IF NOT EXISTS users (
     signature VARCHAR(255),
     reset_token VARCHAR(255),
     reset_token_expires TIMESTAMP,
+    role VARCHAR(50) DEFAULT 'user',
+    active BOOLEAN DEFAULT FALSE,
+    activation_token VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

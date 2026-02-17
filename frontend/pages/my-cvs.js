@@ -86,6 +86,7 @@ export default function MyCVs() {
               style={{
                 padding: '10px 20px',
                 background: '#e8e8e8',
+                color: '#333',
                 border: 'none',
                 borderRadius: '6px',
                 cursor: 'pointer',

@@ -3,6 +3,8 @@ import axios from 'axios';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
 export default function Activate() {
   const router = useRouter();
   const [status, setStatus] = useState('activating');
@@ -13,7 +15,7 @@ export default function Activate() {
     const token = router.query.token;
     if (!token) return;
     
-    axios.get(`http://localhost:5000/api/auth/activate?token=${token}`)
+    axios.get(`${API_URL}/api/auth/activate?token=${token}`)
       .then(() => {
         setStatus('success');
         setMessage('Account activated! You can now log in.');

@@ -3,6 +3,8 @@ import axios from 'axios';
 
 import CVEditor from '../components/CVEditor';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
 export default function CVs() {
   const [cvs, setCvs] = useState([]);
   const [title, setTitle] = useState('');
@@ -14,7 +16,7 @@ export default function CVs() {
     const t = localStorage.getItem('token');
     setToken(t);
     if (!t) return;
-    axios.get('http://localhost:5000/api/cv', {
+    axios.get(`${API_URL}/api/cv`, {
       headers: { Authorization: `Bearer ${t}` }
     })
       .then(res => setCvs(res.data))
@@ -25,7 +27,7 @@ export default function CVs() {
     e.preventDefault();
     setError('');
     try {
-      const res = await axios.post('http://localhost:5000/api/cv', { title, content }, {
+      const res = await axios.post(`${API_URL}/api/cv`, { title, content }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setCvs([...cvs, res.data]);
@@ -43,7 +45,7 @@ export default function CVs() {
         setError('');
         try {
           const token = localStorage.getItem('token');
-          const res = await axios.post('http://localhost:5000/api/cv', {
+          const res = await axios.post(`${API_URL}/api/cv`, {
             title: title || 'My CV',
             content: sections
           }, {
