@@ -34,11 +34,9 @@ router.post('/forgot-password', async (req, res) => {
       port: process.env.SMTP_PORT || 587,
       secure: false,
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+        user: process.env.SMTP_USER || 'user@example.com',
+        pass: process.env.SMTP_PASS || 'password',
       },
-      logger: true,
-      debug: true
     });
     const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`;
     await transporter.sendMail({
@@ -49,8 +47,7 @@ router.post('/forgot-password', async (req, res) => {
     });
     res.json({ message: 'Password reset email sent' });
   } catch (err) {
-    console.error('Forgot password error:', err);
-    res.status(500).json({ error: 'Failed to send reset email', details: err.message });
+    res.status(500).json({ error: 'Failed to send reset email' });
   }
 });
 
@@ -272,7 +269,7 @@ export default router;
 router.get('/me', authenticateToken, async (req, res) => {
   try {
     const result = await pool.query(
-      'SELECT id, email, name, phone, location, occupation, bio, profile_picture, signature, role, active, created_at FROM users WHERE id = $1', 
+      'SELECT id, email, name, phone, location, occupation, bio, profile_picture, signature, role, created_at FROM users WHERE id = $1', 
       [req.user.id]
     );
     if (!result.rows[0]) return res.status(404).json({ error: 'User not found' });

@@ -3,7 +3,7 @@ import axios from 'axios';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 export default function LoginOTP() {
   const router = useRouter();
@@ -16,8 +16,12 @@ export default function LoginOTP() {
   const [loading, setLoading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
   const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotStep, setForgotStep] = useState(1);
   const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotCode, setForgotCode] = useState('');
+  const [newPassword, setNewPassword] = useState('');
   const [forgotMsg, setForgotMsg] = useState('');
+  const [resetSuccess, setResetSuccess] = useState(false);
 
   const validateLogin = () => {
     const errors = {};
@@ -45,7 +49,13 @@ export default function LoginOTP() {
     return errors;
   };
 
-
+  const validateReset = () => {
+    const errors = {};
+    if (!forgotCode.trim()) errors.forgotCode = 'Code is required.';
+    if (!newPassword) errors.newPassword = 'New password is required.';
+    else if (newPassword.length < 6) errors.newPassword = 'Password must be at least 6 characters.';
+    return errors;
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -116,14 +126,41 @@ export default function LoginOTP() {
       await axios.post(`${API_URL}/api/auth/forgot-password`, { 
         email: forgotEmail.trim() 
       });
-      setForgotMsg('A password reset link has been sent to your email. Please check your inbox.');
-      setForgotEmail('');
+      setForgotMsg('A reset code has been sent to your email.');
+      setForgotStep(2);
+    } catch (err) {
+      setForgotMsg(err.response?.data?.error || 'Failed to send reset code');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleReset = async (e) => {
+    e.preventDefault();
+    setForgotMsg('');
+    setFieldErrors({});
+    const errors = validateReset();
+    setFieldErrors(errors);
+    if (Object.keys(errors).length) return;
+    setLoading(true);
+    try {
+      await axios.post(`${API_URL}/api/auth/reset-password`, { 
+        email: forgotEmail.trim(), 
+        code: forgotCode.trim(), 
+        newPassword 
+      });
+      setForgotMsg('Password reset successful! You can now log in.');
+      setResetSuccess(true);
       setTimeout(() => {
         setShowForgotPassword(false);
-        setForgotMsg('');
-      }, 3000);
+        setResetSuccess(false);
+        setForgotStep(1);
+        setForgotEmail('');
+        setForgotCode('');
+        setNewPassword('');
+      }, 2000);
     } catch (err) {
-      setForgotMsg(err.response?.data?.error || 'Failed to send reset email');
+      setForgotMsg(err.response?.data?.error || 'Failed to reset password');
     } finally {
       setLoading(false);
     }
@@ -316,7 +353,7 @@ export default function LoginOTP() {
       )}
 
       {/* Forgot Password: Enter Email */}
-      {showForgotPassword && (
+      {showForgotPassword && forgotStep === 1 && !resetSuccess && (
         <form onSubmit={handleForgot} style={styles.form}>
           <div style={styles.inputWrapper}>
             <input
@@ -344,7 +381,7 @@ export default function LoginOTP() {
             }}
             disabled={loading}
           >
-            {loading ? 'Sending...' : 'Send Reset Link'}
+            {loading ? 'Sending...' : 'Send Reset Code'}
           </button>
           <button
             type="button"
@@ -356,13 +393,72 @@ export default function LoginOTP() {
         </form>
       )}
 
-      {/* Messages */}
+      {/* Forgot Password: Enter Code & New Password */}
+      {showForgotPassword && forgotStep === 2 && !resetSuccess && (
+        <form onSubmit={handleReset} style={styles.form}>
+          <div style={styles.inputWrapper}>
+            <input
+              type="text"
+              placeholder="Enter reset code"
+              value={forgotCode}
+              onChange={e => setForgotCode(e.target.value)}
+              style={{
+                ...styles.input,
+                border: fieldErrors.forgotCode ? '1.5px solid #e53e3e' : '1px solid #bbb'
+              }}
+              aria-label="Reset code"
+              aria-invalid={!!fieldErrors.forgotCode}
+              required
+            />
+            {fieldErrors.forgotCode && (
+              <span style={styles.errorText} role="alert">{fieldErrors.forgotCode}</span>
+            )}
+          </div>
+          <div style={styles.inputWrapper}>
+            <input
+              type="password"
+              placeholder="Enter new password"
+              value={newPassword}
+              onChange={e => setNewPassword(e.target.value)}
+              style={{
+                ...styles.input,
+                border: fieldErrors.newPassword ? '1.5px solid #e53e3e' : '1px solid #bbb'
+              }}
+              aria-label="New password"
+              aria-invalid={!!fieldErrors.newPassword}
+              required
+            />
+            {fieldErrors.newPassword && (
+              <span style={styles.errorText} role="alert">{fieldErrors.newPassword}</span>
+            )}
+          </div>
+          <button
+            type="submit"
+            style={{
+              ...styles.button,
+              ...(loading && styles.buttonDisabled)
+            }}
+            disabled={loading}
+          >
+            {loading ? 'Resetting...' : 'Reset Password'}
+          </button>
+        </form>
+      )}
+
+      {/* Success Message */}
+      {resetSuccess && (
+        <div style={styles.success} role="alert">
+          {forgotMsg}
+        </div>
+      )}
+
+      {/* Error Messages */}
       {error && <p style={styles.error} role="alert">{error}</p>}
-      {forgotMsg && (
+      {forgotMsg && !resetSuccess && (
         <p 
           style={{
             ...styles.error,
-            color: forgotMsg.includes('sent') ? '#38a169' : '#e53e3e'
+            color: forgotMsg.includes('successful') ? '#38a169' : '#e53e3e'
           }} 
           role="alert"
         >
