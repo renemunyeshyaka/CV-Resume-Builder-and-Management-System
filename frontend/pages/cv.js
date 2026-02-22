@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 import CVEditor from '../components/CVEditor';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export default function CVs() {
+  const { t } = useTranslation();
   const [cvs, setCvs] = useState([]);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -20,7 +22,7 @@ export default function CVs() {
       headers: { Authorization: `Bearer ${t}` }
     })
       .then(res => setCvs(res.data))
-      .catch(() => setError('Failed to load CVs'));
+        .catch(() => setError(t('allCvs.loadError')));
   }, []);
 
   const handleCreate = async (e) => {
@@ -34,26 +36,26 @@ export default function CVs() {
       setTitle('');
       setContent('');
     } catch {
-      setError('Failed to create CV');
+      setError(t('cvCreator.errorMessage'));
     }
   };
 
   return (
     <div>
-      <h2>Your CVs</h2>
+      <h2>{t('myCvs.title')}</h2>
       <CVEditor onSave={async (sections) => {
         setError('');
         try {
           const token = localStorage.getItem('token');
           const res = await axios.post(`${API_URL}/api/cv`, {
-            title: title || 'My CV',
+            title: title || t('createCv.defaultTitle'),
             content: sections
           }, {
             headers: { Authorization: `Bearer ${token}` }
           });
           setCvs([...cvs, res.data]);
         } catch {
-          setError('Failed to create CV');
+          setError(t('cvCreator.errorMessage'));
         }
       }} />
       {error && <p style={{color:'red'}}>{error}</p>}

@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export default function ResetPassword() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [token, setToken] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -24,7 +26,7 @@ export default function ResetPassword() {
         setToken(queryToken);
         setTokenValid(true);
       } else {
-        setError('No reset token found. Please check your email link.');
+        setError(t('resetPassword.noToken'));
         setTokenValid(false);
       }
     }
@@ -33,14 +35,14 @@ export default function ResetPassword() {
   const validateReset = () => {
     const errors = {};
     if (!newPassword) {
-      errors.newPassword = 'New password is required.';
+      errors.newPassword = t('resetPassword.newPasswordRequired');
     } else if (newPassword.length < 6) {
-      errors.newPassword = 'Password must be at least 6 characters.';
+      errors.newPassword = t('validation.passwordTooShort');
     }
     if (!confirmPassword) {
-      errors.confirmPassword = 'Please confirm your password.';
+      errors.confirmPassword = t('resetPassword.confirmPasswordRequired');
     } else if (newPassword !== confirmPassword) {
-      errors.confirmPassword = 'Passwords do not match.';
+      errors.confirmPassword = t('validation.passwordMismatch');
     }
     return errors;
   };
@@ -72,7 +74,7 @@ export default function ResetPassword() {
         router.push('/login-otp');
       }, 3000);
     } catch (err) {
-      const errorMsg = err.response?.data?.error || 'Failed to reset password. Please try again.';
+      const errorMsg = err.response?.data?.error || t('resetPassword.resetFailed');
       setError(errorMsg);
     } finally {
       setLoading(false);
@@ -177,7 +179,7 @@ export default function ResetPassword() {
   if (tokenValid === null) {
     return (
       <div style={styles.container}>
-        <div style={styles.loadingMessage}>Loading...</div>
+        <div style={styles.loadingMessage}>{t('messages.loading')}</div>
       </div>
     );
   }
@@ -186,10 +188,10 @@ export default function ResetPassword() {
   if (!tokenValid) {
     return (
       <div style={styles.container}>
-        <h2 style={styles.title}>Reset Password</h2>
+        <h2 style={styles.title}>{t('resetPassword.title')}</h2>
         <div style={styles.error} role="alert">{error}</div>
         <Link href="/login-otp" style={styles.link}>
-          Back to Login
+          {t('resetPassword.backToLogin')}
         </Link>
       </div>
     );
@@ -199,13 +201,13 @@ export default function ResetPassword() {
   if (success) {
     return (
       <div style={styles.container}>
-        <h2 style={styles.title}>Password Reset Successful</h2>
+        <h2 style={styles.title}>{t('resetPassword.successTitle')}</h2>
         <div style={styles.success} role="alert">
-          Your password has been reset successfully!<br />
-          Redirecting to login page in 3 seconds...
+          {t('resetPassword.successMessage')}<br />
+          {t('resetPassword.redirecting')}
         </div>
         <Link href="/login-otp" style={styles.link}>
-          Go to Login Now
+          {t('resetPassword.goToLoginNow')}
         </Link>
       </div>
     );
@@ -213,20 +215,20 @@ export default function ResetPassword() {
 
   return (
     <div style={styles.container}>
-      <h2 style={styles.title}>Reset Your Password</h2>
+      <h2 style={styles.title}>{t('resetPassword.resetYourPassword')}</h2>
 
       <form onSubmit={handleResetPassword} style={styles.form}>
         <div style={styles.inputWrapper}>
           <input
             type="password"
-            placeholder="New Password"
+            placeholder={t('resetPassword.newPassword')}
             value={newPassword}
             onChange={e => setNewPassword(e.target.value)}
             style={{
               ...styles.input,
               ...(fieldErrors.newPassword && styles.inputError)
             }}
-            aria-label="New password"
+            aria-label={t('resetPassword.newPassword')}
             aria-invalid={!!fieldErrors.newPassword}
             required
           />
@@ -240,14 +242,14 @@ export default function ResetPassword() {
         <div style={styles.inputWrapper}>
           <input
             type="password"
-            placeholder="Confirm Password"
+            placeholder={t('resetPassword.confirmPassword')}
             value={confirmPassword}
             onChange={e => setConfirmPassword(e.target.value)}
             style={{
               ...styles.input,
               ...(fieldErrors.confirmPassword && styles.inputError)
             }}
-            aria-label="Confirm password"
+            aria-label={t('resetPassword.confirmPassword')}
             aria-invalid={!!fieldErrors.confirmPassword}
             required
           />
@@ -268,7 +270,7 @@ export default function ResetPassword() {
           onMouseEnter={e => !loading && (e.target.style.background = '#2461c0')}
           onMouseLeave={e => (e.target.style.background = '#2a7ae2')}
         >
-          {loading ? 'Resetting Password...' : 'Reset Password'}
+          {loading ? t('messages.saving') : t('resetPassword.submitButton')}
         </button>
       </form>
 
@@ -279,7 +281,7 @@ export default function ResetPassword() {
       )}
 
       <Link href="/login-otp" style={styles.link}>
-        Back to Login
+        {t('resetPassword.backToLogin')}
       </Link>
     </div>
   );

@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 import CVEditor from '../components/CVEditor';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export default function CreateCV() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [cvTitle, setCvTitle] = useState('My CV');
+  const [cvTitle, setCvTitle] = useState(t('createCv.defaultTitle'));
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -40,12 +42,12 @@ export default function CreateCV() {
         }
       );
 
-      setSuccess('✓ CV saved successfully!');
+      setSuccess(t('createCv.saveSuccess'));
       setTimeout(() => {
         router.push('/my-cvs');
       }, 1500);
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to save CV. Please try again.');
+      setError(err.response?.data?.error || t('createCv.saveError'));
     } finally {
       setSaving(false);
     }
@@ -54,7 +56,7 @@ export default function CreateCV() {
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', fontSize: '18px', color: '#667eea' }}>
-        Loading...
+        {t('messages.loading')}
       </div>
     );
   }
@@ -66,10 +68,10 @@ export default function CreateCV() {
         <div style={{ marginBottom: '30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <h1 style={{ fontSize: '32px', fontWeight: '700', margin: '0 0 10px 0', color: '#333' }}>
-              📝 Create Your Professional CV
+              📝 {t('createCv.title')}
             </h1>
             <p style={{ fontSize: '16px', color: '#666', margin: 0 }}>
-              Build a polished resume that stands out to employers
+              {t('createCv.subtitle')}
             </p>
           </div>
           <button
@@ -88,7 +90,7 @@ export default function CreateCV() {
             onMouseOver={(e) => e.target.style.background = '#d8d8d8'}
             onMouseOut={(e) => e.target.style.background = '#e8e8e8'}
           >
-            ← Back
+            ← {t('createCv.back')}
           </button>
         </div>
 
@@ -101,13 +103,13 @@ export default function CreateCV() {
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
         }}>
           <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px', color: '#333' }}>
-            CV Title
+            {t('createCv.cvTitleLabel')}
           </label>
           <input
             type="text"
             value={cvTitle}
             onChange={(e) => setCvTitle(e.target.value)}
-            placeholder="e.g., Software Engineer CV 2024"
+            placeholder={t('createCv.cvTitlePlaceholder')}
             style={{
               width: '100%',
               maxWidth: '400px',
@@ -166,7 +168,7 @@ export default function CreateCV() {
               zIndex: 10
             }}>
               <div style={{ fontSize: '16px', color: '#667eea', fontWeight: '600' }}>
-                Saving your CV...
+                {t('createCv.savingOverlay')}
               </div>
             </div>
           )}
@@ -183,15 +185,15 @@ export default function CreateCV() {
           marginBottom: '30px'
         }}>
           <h3 style={{ margin: '0 0 15px 0', color: '#333', fontSize: '16px', fontWeight: '700' }}>
-            💡 Tips for a Better CV:
+            💡 {t('createCv.tipsTitle')}
           </h3>
           <ul style={{ margin: 0, paddingLeft: '20px', color: '#555', fontSize: '14px', lineHeight: '1.8' }}>
-            <li>Keep your CV concise - aim for 1-2 pages</li>
-            <li>Use clear, professional language and avoid jargon</li>
-            <li>Focus on achievements and measurable results</li>
-            <li>Include relevant skills and certifications</li>
-            <li>Use consistent formatting and proper grammar</li>
-            <li>Add links to your projects and portfolio</li>
+            <li>{t('createCv.tip1')}</li>
+            <li>{t('createCv.tip2')}</li>
+            <li>{t('createCv.tip3')}</li>
+            <li>{t('createCv.tip4')}</li>
+            <li>{t('createCv.tip5')}</li>
+            <li>{t('createCv.tip6')}</li>
           </ul>
         </div>
       </div>

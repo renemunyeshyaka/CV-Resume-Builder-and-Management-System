@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 import FileUpload from '../components/FileUpload';
 import SignaturePad from '../components/SignaturePad';
 import styles from '../styles/Profile.module.css';
@@ -9,6 +10,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export default function Profile() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -63,7 +65,7 @@ export default function Profile() {
       setLoading(false);
     } catch (err) {
       console.error('Profile fetch error:', err);
-      setError('Failed to load profile');
+      setError(t('profile.errorMessage'));
       setLoading(false);
     }
   };
@@ -79,12 +81,12 @@ export default function Profile() {
     setSuccess('');
 
     if (!formData.name.trim()) {
-      setError('Name is required');
+      setError(t('profile.nameRequired'));
       return;
     }
 
     if (!formData.email.trim()) {
-      setError('Email is required');
+      setError(t('profile.emailRequired'));
       return;
     }
 
@@ -104,19 +106,19 @@ export default function Profile() {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
-      setSuccess('✓ Profile updated successfully!');
+      setSuccess(t('profile.successMessage'));
       setIsEditing(false);
       setUser(prev => ({ ...prev, ...formData }));
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to update profile');
+      setError(err.response?.data?.error || t('profile.errorMessage'));
     }
   };
 
   if (loading) {
     return (
       <div className={styles.loadingContainer}>
-        <p>Loading profile...</p>
+        <p>{t('messages.loading')}</p>
       </div>
     );
   }
@@ -127,14 +129,14 @@ export default function Profile() {
         {/* Header */}
         <div className={styles.header}>
           <div>
-            <h1 className={styles.title}>👤 My Profile</h1>
-            <p className={styles.subtitle}>Manage your professional information</p>
+            <h1 className={styles.title}>👤 {t('profile.myProfile')}</h1>
+            <p className={styles.subtitle}>{t('profile.subtitle')}</p>
           </div>
           <button
             onClick={() => router.push('/user-dashboard')}
             className={styles.backButton}
           >
-            ← Back
+            ← {t('profile.back')}
           </button>
         </div>
 
@@ -155,115 +157,115 @@ export default function Profile() {
           {/* Profile Information Section */}
           <div className={styles.card}>
             <div className={styles.cardHeader}>
-              <h2>📋 Profile Information</h2>
+              <h2>📋 {t('profile.profileInfoTitle')}</h2>
               <button
                 onClick={() => setIsEditing(!isEditing)}
                 className={styles.editButton}
               >
-                {isEditing ? '✕ Cancel' : '✏️ Edit'}
+                {isEditing ? `✕ ${t('profile.cancel')}` : `✏️ ${t('profile.editProfile')}`}
               </button>
             </div>
 
             {!isEditing ? (
               <div className={styles.profileView}>
                 <div className={styles.profileItem}>
-                  <label>Name</label>
-                  <p>{formData.name || 'Not set'}</p>
+                  <label>{t('profile.nameLabel')}</label>
+                  <p>{formData.name || t('profile.notSet')}</p>
                 </div>
 
                 <div className={styles.profileItem}>
-                  <label>Email</label>
-                  <p>{formData.email || 'Not set'}</p>
+                  <label>{t('profile.emailLabel')}</label>
+                  <p>{formData.email || t('profile.notSet')}</p>
                 </div>
 
                 <div className={styles.profileItem}>
-                  <label>Phone</label>
-                  <p>{formData.phone || 'Not set'}</p>
+                  <label>{t('profile.phoneLabel')}</label>
+                  <p>{formData.phone || t('profile.notSet')}</p>
                 </div>
 
                 <div className={styles.profileItem}>
-                  <label>Location</label>
-                  <p>{formData.location || 'Not set'}</p>
+                  <label>{t('profile.locationLabel')}</label>
+                  <p>{formData.location || t('profile.notSet')}</p>
                 </div>
 
                 <div className={styles.profileItem}>
-                  <label>Occupation</label>
-                  <p>{formData.occupation || 'Not set'}</p>
+                  <label>{t('profile.occupationLabel')}</label>
+                  <p>{formData.occupation || t('profile.notSet')}</p>
                 </div>
 
                 <div className={styles.profileItem}>
-                  <label>Bio</label>
-                  <p className={styles.bioText}>{formData.bio || 'Not set'}</p>
+                  <label>{t('profile.bioLabel')}</label>
+                  <p className={styles.bioText}>{formData.bio || t('profile.notSet')}</p>
                 </div>
               </div>
             ) : (
               <div className={styles.profileForm}>
                 <div className={styles.formGroup}>
-                  <label>Full Name *</label>
+                  <label>{t('profile.fullNameLabel')}</label>
                   <input
                     type="text"
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
-                    placeholder="Your full name"
+                    placeholder={t('profile.fullNamePlaceholder')}
                   />
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label>Email *</label>
+                  <label>{t('profile.emailRequiredLabel')}</label>
                   <input
                     type="email"
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    placeholder="your.email@example.com"
+                    placeholder={t('profile.emailLabel')}
                     disabled
                   />
-                  <small>Email cannot be changed</small>
+                  <small>{t('profile.emailCannotChange')}</small>
                 </div>
 
                 <div className={styles.formRow}>
                   <div className={styles.formGroup}>
-                    <label>Phone</label>
+                    <label>{t('profile.phoneLabel')}</label>
                     <input
                       type="tel"
                       name="phone"
                       value={formData.phone}
                       onChange={handleInputChange}
-                      placeholder="+1 (555) 123-4567"
+                      placeholder={t('profile.phonePlaceholder')}
                     />
                   </div>
 
                   <div className={styles.formGroup}>
-                    <label>Occupation</label>
+                    <label>{t('profile.occupationLabel')}</label>
                     <input
                       type="text"
                       name="occupation"
                       value={formData.occupation}
                       onChange={handleInputChange}
-                      placeholder="e.g., Software Engineer"
+                      placeholder={t('profile.occupationPlaceholder')}
                     />
                   </div>
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label>Location</label>
+                  <label>{t('profile.locationLabel')}</label>
                   <input
                     type="text"
                     name="location"
                     value={formData.location}
                     onChange={handleInputChange}
-                    placeholder="City, Country"
+                    placeholder={t('profile.locationPlaceholder')}
                   />
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label>Professional Bio</label>
+                  <label>{t('profile.bioTitle')}</label>
                   <textarea
                     name="bio"
                     value={formData.bio}
                     onChange={handleInputChange}
-                    placeholder="Write a brief professional bio about yourself..."
+                    placeholder={t('profile.bioPlaceholder')}
                     rows={4}
                   />
                 </div>
@@ -272,7 +274,7 @@ export default function Profile() {
                   onClick={handleSaveProfile}
                   className={styles.saveButton}
                 >
-                  💾 Save Changes
+                  💾 {t('profile.saveChanges')}
                 </button>
               </div>
             )}
@@ -280,13 +282,13 @@ export default function Profile() {
 
           {/* Media Section */}
           <div className={styles.card}>
-            <h2 className={styles.cardTitle}>🖼️ Profile Media</h2>
+            <h2 className={styles.cardTitle}>🖼️ {t('profile.profileMediaTitle')}</h2>
             
             <div className={styles.mediaSection}>
               <div className={styles.mediaItem}>
-                <h3>Profile Picture</h3>
+                <h3>{t('profile.profilePictureTitle')}</h3>
                 <p className={styles.mediaDescription}>
-                  Upload a professional profile photo
+                  {t('profile.profilePictureDesc')}
                 </p>
                 
                 {/* Profile Picture Preview */}
@@ -316,13 +318,13 @@ export default function Profile() {
                       }}
                     />
                     <p style={{ marginTop: '10px', fontSize: '12px', color: '#666' }}>
-                      Current Profile Picture
+                      {t('profile.currentProfilePicture')}
                     </p>
                   </div>
                 )}
                 
                 <FileUpload
-                  label="Upload Photo"
+                  label={t('profile.uploadPhoto')}
                   endpoint="profile-picture"
                   field="profile_picture"
                   onUploadSuccess={() => {
@@ -335,9 +337,9 @@ export default function Profile() {
               <div className={styles.divider}></div>
 
               <div className={styles.mediaItem}>
-                <h3>Electronic Signature</h3>
+                <h3>{t('profile.signatureTitle')}</h3>
                 <p className={styles.mediaDescription}>
-                  Upload your signature image file
+                  {t('profile.signatureDesc')}
                 </p>
                 
                 {/* Signature Preview */}
@@ -367,13 +369,13 @@ export default function Profile() {
                       }}
                     />
                     <p style={{ marginTop: '10px', fontSize: '12px', color: '#666' }}>
-                      Current Signature
+                      {t('profile.currentSignature')}
                     </p>
                   </div>
                 )}
                 
                 <FileUpload
-                  label="Upload Signature"
+                  label={t('profile.uploadSignature')}
                   endpoint="signature"
                   field="signature"
                   onUploadSuccess={() => {
@@ -387,9 +389,9 @@ export default function Profile() {
 
           {/* Signature Pad Section */}
           <div className={styles.card} style={{ gridColumn: '1 / -1' }}>
-            <h2 className={styles.cardTitle}>✍️ Draw Your Signature</h2>
+            <h2 className={styles.cardTitle}>✍️ {t('profile.drawSignatureTitle')}</h2>
             <p className={styles.cardDescription}>
-              Use your mouse or touch device to draw your signature below
+              {t('profile.drawSignatureDesc')}
             </p>
             <div className={styles.signaturePadWrapper}>
               <SignaturePad onSave={async (dataUrl) => {
@@ -406,10 +408,10 @@ export default function Profile() {
                     headers: { 'Authorization': `Bearer ${token}` },
                     body: formData
                   });
-                  setSuccess('✓ Signature uploaded successfully!');
+                  setSuccess(t('profile.signatureUploadSuccess'));
                   setTimeout(() => setSuccess(''), 3000);
                 } catch (err) {
-                  setError('Failed to upload signature');
+                  setError(t('profile.signatureUploadError'));
                 }
               }} />
             </div>
@@ -418,27 +420,27 @@ export default function Profile() {
 
         {/* Account Information Section */}
         <div className={styles.card}>
-          <h2 className={styles.cardTitle}>🔐 Account Information</h2>
+          <h2 className={styles.cardTitle}>🔐 {t('profile.accountInfoTitle')}</h2>
           <div className={styles.accountInfo}>
             <div className={styles.infoRow}>
-              <span className={styles.infoLabel}>Account Status:</span>
+              <span className={styles.infoLabel}>{t('profile.accountStatusLabel')}</span>
               <span className={user?.active ? styles.statusActive : styles.statusInactive}>
-                {user?.active ? '✓ Active' : '⏸️ Inactive'}
+                {user?.active ? t('profile.statusActive') : t('profile.statusInactive')}
               </span>
             </div>
             <div className={styles.infoRow}>
-              <span className={styles.infoLabel}>Member Since:</span>
+              <span className={styles.infoLabel}>{t('profile.memberSinceLabel')}</span>
               <span className={styles.infoValue}>
                 {user?.created_at ? new Date(user.created_at).toLocaleDateString('en-US', {
                   year: 'numeric',
                   month: 'long',
                   day: 'numeric'
-                }) : 'Not set'}
+                }) : t('profile.notSet')}
               </span>
             </div>
             <div className={styles.infoRow}>
-              <span className={styles.infoLabel}>Role:</span>
-              <span className={styles.roleTag}>{user?.role || 'User'}</span>
+              <span className={styles.infoLabel}>{t('profile.roleLabel')}</span>
+              <span className={styles.roleTag}>{user?.role || t('profile.userRoleFallback')}</span>
             </div>
           </div>
         </div>

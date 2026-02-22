@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export default function SystemSettings() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [settings, setSettings] = useState({
     max_cv_per_user: 10,
     max_file_size_mb: 5,
@@ -57,23 +59,23 @@ export default function SystemSettings() {
       await axios.put(`${API_URL}/api/admin/settings`, settings, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      showMessage('Settings saved successfully', 'success');
+      showMessage(t('systemSettings.savedSuccess'), 'success');
     } catch (error) {
-      showMessage(error.response?.data?.error || 'Failed to save settings', 'error');
+      showMessage(error.response?.data?.error || t('systemSettings.saveError'), 'error');
     } finally {
       setSaving(false);
     }
   };
 
-  if (loading) return <div style={{ padding: '40px', textAlign: 'center' }}>Loading...</div>;
+  if (loading) return <div style={{ padding: '40px', textAlign: 'center' }}>{t('systemSettings.loading')}</div>;
 
   return (
     <div style={{ padding: '40px', minHeight: '100vh', background: '#f5f5f5' }}>
       <div style={{ maxWidth: '900px', margin: '0 auto' }}>
         {/* Header */}
         <div style={{ marginBottom: '30px' }}>
-          <h1 style={{ fontSize: '32px', fontWeight: '700', color: '#333', marginBottom: '10px' }}>System Settings</h1>
-          <button onClick={() => router.push('/admin-dashboard')} style={{ background: 'none', border: 'none', color: '#667eea', cursor: 'pointer', fontSize: '14px' }}>← Back to Dashboard</button>
+          <h1 style={{ fontSize: '32px', fontWeight: '700', color: '#333', marginBottom: '10px' }}>{t('systemSettings.title')}</h1>
+          <button onClick={() => router.push('/admin-dashboard')} style={{ background: 'none', border: 'none', color: '#667eea', cursor: 'pointer', fontSize: '14px' }}>← {t('systemSettings.backToDashboard')}</button>
         </div>
 
         {/* Message Alert */}
@@ -86,10 +88,10 @@ export default function SystemSettings() {
         {/* Settings Form */}
         <form onSubmit={handleSaveSettings}>
           <div style={{ background: 'white', padding: '30px', borderRadius: '10px', marginBottom: '20px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
-            <h2 style={{ fontSize: '20px', marginBottom: '20px', color: '#333' }}>General Settings</h2>
+            <h2 style={{ fontSize: '20px', marginBottom: '20px', color: '#333' }}>{t('systemSettings.generalSettings')}</h2>
             
             <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#333' }}>Maximum CVs per User</label>
+              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#333' }}>{t('systemSettings.maxCvsLabel')}</label>
               <input
                 type="number"
                 min="1"
@@ -98,11 +100,11 @@ export default function SystemSettings() {
                 onChange={(e) => setSettings({...settings, max_cv_per_user: parseInt(e.target.value)})}
                 style={{ width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '5px', fontSize: '14px' }}
               />
-              <small style={{ color: '#666', fontSize: '12px' }}>Number of CVs each user can create</small>
+              <small style={{ color: '#666', fontSize: '12px' }}>{t('systemSettings.maxCvsHelp')}</small>
             </div>
 
             <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#333' }}>Maximum File Size (MB)</label>
+              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#333' }}>{t('systemSettings.maxFileSizeLabel')}</label>
               <input
                 type="number"
                 min="1"
@@ -111,11 +113,11 @@ export default function SystemSettings() {
                 onChange={(e) => setSettings({...settings, max_file_size_mb: parseInt(e.target.value)})}
                 style={{ width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '5px', fontSize: '14px' }}
               />
-              <small style={{ color: '#666', fontSize: '12px' }}>Maximum size for uploaded files (photos, signatures)</small>
+              <small style={{ color: '#666', fontSize: '12px' }}>{t('systemSettings.maxFileSizeHelp')}</small>
             </div>
 
             <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#333' }}>Session Timeout (Minutes)</label>
+              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#333' }}>{t('systemSettings.sessionTimeoutLabel')}</label>
               <input
                 type="number"
                 min="15"
@@ -124,24 +126,24 @@ export default function SystemSettings() {
                 onChange={(e) => setSettings({...settings, session_timeout_minutes: parseInt(e.target.value)})}
                 style={{ width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '5px', fontSize: '14px' }}
               />
-              <small style={{ color: '#666', fontSize: '12px' }}>How long users stay logged in without activity</small>
+              <small style={{ color: '#666', fontSize: '12px' }}>{t('systemSettings.sessionTimeoutHelp')}</small>
             </div>
 
             <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#333' }}>Allowed File Types</label>
+              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#333' }}>{t('systemSettings.allowedTypesLabel')}</label>
               <input
                 type="text"
                 value={settings.allowed_file_types}
                 onChange={(e) => setSettings({...settings, allowed_file_types: e.target.value})}
-                placeholder=".pdf,.jpg,.png"
+                placeholder={t('systemSettings.allowedTypesPlaceholder')}
                 style={{ width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '5px', fontSize: '14px' }}
               />
-              <small style={{ color: '#666', fontSize: '12px' }}>Comma-separated file extensions</small>
+              <small style={{ color: '#666', fontSize: '12px' }}>{t('systemSettings.allowedTypesHelp')}</small>
             </div>
           </div>
 
           <div style={{ background: 'white', padding: '30px', borderRadius: '10px', marginBottom: '20px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
-            <h2 style={{ fontSize: '20px', marginBottom: '20px', color: '#333' }}>Security Settings</h2>
+            <h2 style={{ fontSize: '20px', marginBottom: '20px', color: '#333' }}>{t('systemSettings.securitySettings')}</h2>
             
             <div style={{ marginBottom: '20px' }}>
               <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
@@ -151,9 +153,9 @@ export default function SystemSettings() {
                   onChange={(e) => setSettings({...settings, require_email_verification: e.target.checked})}
                   style={{ marginRight: '10px', width: '18px', height: '18px', cursor: 'pointer' }}
                 />
-                <span style={{ fontSize: '14px', fontWeight: '600', color: '#333' }}>Require Email Verification</span>
+                <span style={{ fontSize: '14px', fontWeight: '600', color: '#333' }}>{t('systemSettings.requireEmailVerification')}</span>
               </label>
-              <small style={{ color: '#666', fontSize: '12px', marginLeft: '28px' }}>Users must verify their email before accessing the system</small>
+              <small style={{ color: '#666', fontSize: '12px', marginLeft: '28px' }}>{t('systemSettings.requireEmailHelp')}</small>
             </div>
 
             <div style={{ marginBottom: '0' }}>
@@ -164,9 +166,9 @@ export default function SystemSettings() {
                   onChange={(e) => setSettings({...settings, enable_otp_login: e.target.checked})}
                   style={{ marginRight: '10px', width: '18px', height: '18px', cursor: 'pointer' }}
                 />
-                <span style={{ fontSize: '14px', fontWeight: '600', color: '#333' }}>Enable OTP Login</span>
+                <span style={{ fontSize: '14px', fontWeight: '600', color: '#333' }}>{t('systemSettings.enableOtpLogin')}</span>
               </label>
-              <small style={{ color: '#666', fontSize: '12px', marginLeft: '28px' }}>Require one-time password for each login</small>
+              <small style={{ color: '#666', fontSize: '12px', marginLeft: '28px' }}>{t('systemSettings.enableOtpHelp')}</small>
             </div>
           </div>
 
@@ -176,14 +178,14 @@ export default function SystemSettings() {
               disabled={saving}
               style={{ padding: '12px 30px', background: '#667eea', color: 'white', border: 'none', borderRadius: '5px', cursor: saving ? 'not-allowed' : 'pointer', fontWeight: '600', fontSize: '14px', opacity: saving ? 0.7 : 1 }}
             >
-              {saving ? 'Saving...' : 'Save Settings'}
+              {saving ? t('systemSettings.saving') : t('systemSettings.saveSettings')}
             </button>
             <button
               type="button"
               onClick={fetchSettings}
               style={{ padding: '12px 30px', background: '#6c757d', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: '600', fontSize: '14px' }}
             >
-              Reset
+              {t('systemSettings.reset')}
             </button>
           </div>
         </form>

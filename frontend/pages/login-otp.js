@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { useTranslation } from 'react-i18next';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export default function LoginOTP() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -22,26 +24,26 @@ export default function LoginOTP() {
   const validateLogin = () => {
     const errors = {};
     const trimmedEmail = email.trim();
-    if (!trimmedEmail) errors.email = 'Email is required.';
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) errors.email = 'Invalid email address.';
-    if (!password) errors.password = 'Password is required.';
-    else if (password.length < 6) errors.password = 'Password must be at least 6 characters.';
+    if (!trimmedEmail) errors.email = t('loginOtp.emailRequired');
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) errors.email = t('loginOtp.emailInvalid');
+    if (!password) errors.password = t('loginOtp.passwordRequired');
+    else if (password.length < 6) errors.password = t('loginOtp.passwordMin');
     return errors;
   };
 
   const validateOtp = () => {
     const errors = {};
     const trimmedOtp = otp.trim();
-    if (!trimmedOtp) errors.otp = 'OTP is required.';
-    else if (!/^\d{6}$/.test(trimmedOtp)) errors.otp = 'OTP must be 6 digits.';
+    if (!trimmedOtp) errors.otp = t('loginOtp.otpRequired');
+    else if (!/^\d{6}$/.test(trimmedOtp)) errors.otp = t('loginOtp.otpFormat');
     return errors;
   };
 
   const validateForgot = () => {
     const errors = {};
     const trimmedEmail = forgotEmail.trim();
-    if (!trimmedEmail) errors.forgotEmail = 'Email is required.';
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) errors.forgotEmail = 'Invalid email address.';
+    if (!trimmedEmail) errors.forgotEmail = t('loginOtp.emailRequired');
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) errors.forgotEmail = t('loginOtp.emailInvalid');
     return errors;
   };
 
@@ -63,7 +65,7 @@ export default function LoginOTP() {
       setUserId(res.data.userId);
       setStep(2);
     } catch (err) {
-      setError(err.response?.data?.error || 'Login failed. Please try again.');
+      setError(err.response?.data?.error || t('loginOtp.loginFailed'));
     } finally {
       setLoading(false);
     }
@@ -98,7 +100,7 @@ export default function LoginOTP() {
         router.push('/user-dashboard');
       }
     } catch (err) {
-      setError(err.response?.data?.error || 'OTP verification failed. Please try again.');
+      setError(err.response?.data?.error || t('loginOtp.loginFailed'));
     } finally {
       setLoading(false);
     }
@@ -116,14 +118,14 @@ export default function LoginOTP() {
       await axios.post(`${API_URL}/api/auth/forgot-password`, { 
         email: forgotEmail.trim() 
       });
-      setForgotMsg('A password reset link has been sent to your email. Please check your inbox.');
+      setForgotMsg(t('loginOtp.otpSent'));
       setForgotEmail('');
       setTimeout(() => {
         setShowForgotPassword(false);
         setForgotMsg('');
       }, 3000);
     } catch (err) {
-      setForgotMsg(err.response?.data?.error || 'Failed to send reset email');
+      setForgotMsg(err.response?.data?.error || t('messages.error'));
     } finally {
       setLoading(false);
     }
@@ -209,7 +211,7 @@ export default function LoginOTP() {
   return (
     <div style={styles.container}>
       <h2 style={styles.title}>
-        {showForgotPassword ? 'Reset Password' : 'Login (OTP)'}
+        {showForgotPassword ? t('loginOtp.forgotPassword') : t('loginOtp.title')}
       </h2>
 
       {/* Login Step 1: Email & Password */}
@@ -218,14 +220,14 @@ export default function LoginOTP() {
           <div style={styles.inputWrapper}>
             <input
               type="email"
-              placeholder="Email"
+              placeholder={t('loginOtp.emailLabel')}
               value={email}
               onChange={e => setEmail(e.target.value)}
               style={{
                 ...styles.input,
                 border: fieldErrors.email ? '1.5px solid #e53e3e' : '1px solid #bbb'
               }}
-              aria-label="Email"
+              aria-label={t('loginOtp.emailLabel')}
               aria-invalid={!!fieldErrors.email}
               required
             />
@@ -236,17 +238,17 @@ export default function LoginOTP() {
           <div style={styles.inputWrapper}>
             <input
               type="password"
-              placeholder="Password"
+              placeholder={t('loginOtp.passwordLabel')}
               value={password}
               onChange={e => setPassword(e.target.value)}
               style={{
                 ...styles.input,
                 border: fieldErrors.password ? '1.5px solid #e53e3e' : '1px solid #bbb'
               }}
-              aria-label="Password"
+              aria-label={t('loginOtp.passwordLabel')}
               aria-invalid={!!fieldErrors.password}
               required
-            />
+              />
             {fieldErrors.password && (
               <span style={styles.errorText} role="alert">{fieldErrors.password}</span>
             )}
@@ -259,7 +261,7 @@ export default function LoginOTP() {
             }}
             disabled={loading}
           >
-            {loading ? 'Sending OTP...' : 'Send OTP'}
+            {loading ? t('messages.loading') : t('loginOtp.loginButton')}
           </button>
           <div style={{ textAlign: 'right', marginTop: 8 }}>
             <button
@@ -267,7 +269,7 @@ export default function LoginOTP() {
               style={styles.textButton}
               onClick={() => setShowForgotPassword(true)}
             >
-              Forgot Password?
+              {t('loginOtp.forgotPassword')}
             </button>
           </div>
         </form>
@@ -279,7 +281,7 @@ export default function LoginOTP() {
           <div style={styles.inputWrapper}>
             <input
               type="text"
-              placeholder="Enter 6-digit OTP"
+              placeholder={t('loginOtp.otpLabel')}
               value={otp}
               onChange={e => setOtp(e.target.value)}
               maxLength={6}
@@ -287,7 +289,7 @@ export default function LoginOTP() {
                 ...styles.input,
                 border: fieldErrors.otp ? '1.5px solid #e53e3e' : '1px solid #bbb'
               }}
-              aria-label="OTP"
+              aria-label={t('loginOtp.otpLabel')}
               aria-invalid={!!fieldErrors.otp}
               required
             />
@@ -303,14 +305,14 @@ export default function LoginOTP() {
             }}
             disabled={loading}
           >
-            {loading ? 'Verifying...' : 'Verify OTP'}
+            {loading ? t('messages.loading') : t('loginOtp.verifyButton')}
           </button>
           <button
             type="button"
             style={styles.textButton}
             onClick={() => setStep(1)}
           >
-            ← Back to login
+            ← {t('buttons.back')}
           </button>
         </form>
       )}
@@ -321,14 +323,14 @@ export default function LoginOTP() {
           <div style={styles.inputWrapper}>
             <input
               type="email"
-              placeholder="Enter your email"
+              placeholder={t('home.yourEmail')}
               value={forgotEmail}
               onChange={e => setForgotEmail(e.target.value)}
               style={{
                 ...styles.input,
                 border: fieldErrors.forgotEmail ? '1.5px solid #e53e3e' : '1px solid #bbb'
               }}
-              aria-label="Email for password reset"
+              aria-label={t('home.yourEmail')}
               aria-invalid={!!fieldErrors.forgotEmail}
               required
             />
@@ -344,14 +346,14 @@ export default function LoginOTP() {
             }}
             disabled={loading}
           >
-            {loading ? 'Sending...' : 'Send Reset Link'}
+            {loading ? t('messages.saving') : t('buttons.submit')}
           </button>
           <button
             type="button"
             style={styles.textButton}
             onClick={() => setShowForgotPassword(false)}
           >
-            ← Back to login
+            ← {t('buttons.back')}
           </button>
         </form>
       )}
@@ -371,7 +373,7 @@ export default function LoginOTP() {
       )}
 
       <Link href="/" style={styles.link}>
-        Go back home
+        {t('nav.home')}
       </Link>
     </div>
   );

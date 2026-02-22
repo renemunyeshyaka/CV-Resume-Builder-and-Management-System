@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export default function ManageUsers() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -35,7 +37,7 @@ export default function ManageUsers() {
       setLoading(false);
     } catch (error) {
       console.error('Error fetching users:', error);
-      showMessage('Failed to fetch users', 'error');
+      showMessage(t('manageUsers.fetchError'), 'error');
       setLoading(false);
     }
   };
@@ -53,12 +55,12 @@ export default function ManageUsers() {
       await axios.post(`${API_URL}/api/admin/users`, newUser, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      showMessage('User added successfully', 'success');
+      showMessage(t('manageUsers.addSuccess'), 'success');
       setShowAddModal(false);
       setNewUser({ name: '', email: '', password: '', role: 'user' });
       fetchUsers();
     } catch (error) {
-      showMessage(error.response?.data?.error || 'Failed to add user', 'error');
+      showMessage(error.response?.data?.error || t('manageUsers.addError'), 'error');
     }
   };
 
@@ -70,27 +72,27 @@ export default function ManageUsers() {
       await axios.put(`${API_URL}/api/admin/users/${selectedUser.id}`, selectedUser, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      showMessage('User updated successfully', 'success');
+      showMessage(t('manageUsers.updateSuccess'), 'success');
       setShowEditModal(false);
       setSelectedUser(null);
       fetchUsers();
     } catch (error) {
-      showMessage(error.response?.data?.error || 'Failed to update user', 'error');
+      showMessage(error.response?.data?.error || t('manageUsers.updateError'), 'error');
     }
   };
 
   const handleDeleteUser = async (userId) => {
-    if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) return;
+    if (!confirm(t('manageUsers.confirmDelete'))) return;
 
     const token = localStorage.getItem('token');
     try {
       await axios.delete(`${API_URL}/api/admin/users/${userId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      showMessage('User deleted successfully', 'success');
+      showMessage(t('manageUsers.deleteSuccess'), 'success');
       fetchUsers();
     } catch (error) {
-      showMessage(error.response?.data?.error || 'Failed to delete user', 'error');
+      showMessage(error.response?.data?.error || t('manageUsers.deleteError'), 'error');
     }
   };
 
@@ -101,10 +103,10 @@ export default function ManageUsers() {
         { active: !currentStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      showMessage(`User ${!currentStatus ? 'activated' : 'deactivated'} successfully`, 'success');
+      showMessage(t('manageUsers.statusUpdated'), 'success');
       fetchUsers();
     } catch (error) {
-      showMessage(error.response?.data?.error || 'Failed to update user status', 'error');
+      showMessage(error.response?.data?.error || t('manageUsers.updateError'), 'error');
     }
   };
 
@@ -115,7 +117,7 @@ export default function ManageUsers() {
     return matchesSearch && matchesRole;
   });
 
-  if (loading) return <div style={{ padding: '40px', textAlign: 'center' }}>Loading...</div>;
+  if (loading) return <div style={{ padding: '40px', textAlign: 'center' }}>{t('manageUsers.loading')}</div>;
 
   return (
     <div style={{ padding: '40px', minHeight: '100vh', background: '#f5f5f5' }}>
@@ -123,10 +125,10 @@ export default function ManageUsers() {
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
           <div>
-            <h1 style={{ fontSize: '32px', fontWeight: '700', color: '#333', marginBottom: '10px' }}>Manage Users</h1>
-            <button onClick={() => router.push('/admin-dashboard')} style={{ background: 'none', border: 'none', color: '#667eea', cursor: 'pointer', fontSize: '14px' }}>← Back to Dashboard</button>
+            <h1 style={{ fontSize: '32px', fontWeight: '700', color: '#333', marginBottom: '10px' }}>{t('manageUsers.title')}</h1>
+            <button onClick={() => router.push('/admin-dashboard')} style={{ background: 'none', border: 'none', color: '#667eea', cursor: 'pointer', fontSize: '14px' }}>← {t('manageUsers.backToDashboard')}</button>
           </div>
-          <button onClick={() => setShowAddModal(true)} style={{ padding: '12px 24px', background: '#667eea', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: '600' }}>+ Add User</button>
+          <button onClick={() => setShowAddModal(true)} style={{ padding: '12px 24px', background: '#667eea', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: '600' }}>+ {t('manageUsers.addUser')}</button>
         </div>
 
         {/* Message Alert */}
@@ -141,16 +143,16 @@ export default function ManageUsers() {
           <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
             <input
               type="text"
-              placeholder="Search by name or email..."
+              placeholder={t('manageUsers.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{ flex: '1', minWidth: '250px', padding: '10px', border: '1px solid #ddd', borderRadius: '5px', fontSize: '14px' }}
             />
             <select value={filterRole} onChange={(e) => setFilterRole(e.target.value)} style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '5px', fontSize: '14px', cursor: 'pointer' }}>
-              <option value="all">All Roles</option>
-              <option value="user">User</option>
-              <option value="hr">HR</option>
-              <option value="admin">Admin</option>
+              <option value="all">{t('manageUsers.allRoles')}</option>
+              <option value="user">{t('manageUsers.roleUser')}</option>
+              <option value="hr">{t('manageUsers.roleHr')}</option>
+              <option value="admin">{t('manageUsers.roleAdmin')}</option>
             </select>
           </div>
         </div>
@@ -160,18 +162,18 @@ export default function ManageUsers() {
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead style={{ background: '#f8f9fa' }}>
               <tr>
-                <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600', color: '#333' }}>Name</th>
-                <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600', color: '#333' }}>Email</th>
-                <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600', color: '#333' }}>Role</th>
-                <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600', color: '#333' }}>Status</th>
-                <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600', color: '#333' }}>Created</th>
-                <th style={{ padding: '15px', textAlign: 'center', fontWeight: '600', color: '#333' }}>Actions</th>
+                <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600', color: '#333' }}>{t('manageUsers.name')}</th>
+                <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600', color: '#333' }}>{t('manageUsers.email')}</th>
+                <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600', color: '#333' }}>{t('manageUsers.role')}</th>
+                <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600', color: '#333' }}>{t('manageUsers.status')}</th>
+                <th style={{ padding: '15px', textAlign: 'left', fontWeight: '600', color: '#333' }}>{t('manageUsers.created')}</th>
+                <th style={{ padding: '15px', textAlign: 'center', fontWeight: '600', color: '#333' }}>{t('manageUsers.actions')}</th>
               </tr>
             </thead>
             <tbody>
               {filteredUsers.length === 0 ? (
                 <tr>
-                  <td colSpan="6" style={{ padding: '40px', textAlign: 'center', color: '#999' }}>No users found</td>
+                  <td colSpan="6" style={{ padding: '40px', textAlign: 'center', color: '#999' }}>{t('manageUsers.noUsers')}</td>
                 </tr>
               ) : (
                 filteredUsers.map(user => (
@@ -185,17 +187,17 @@ export default function ManageUsers() {
                     </td>
                     <td style={{ padding: '15px' }}>
                       <span style={{ padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: '600', background: user.active ? '#28a745' : '#6c757d', color: 'white' }}>
-                        {user.active ? 'Active' : 'Inactive'}
+                        {user.active ? t('manageUsers.statusActive') : t('manageUsers.statusInactive')}
                       </span>
                     </td>
                     <td style={{ padding: '15px', fontSize: '14px', color: '#666' }}>{new Date(user.created_at).toLocaleDateString()}</td>
                     <td style={{ padding: '15px', textAlign: 'center' }}>
                       <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
-                        <button onClick={() => { setSelectedUser(user); setShowEditModal(true); }} style={{ padding: '6px 12px', background: '#667eea', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '12px' }}>Edit</button>
+                        <button onClick={() => { setSelectedUser(user); setShowEditModal(true); }} style={{ padding: '6px 12px', background: '#667eea', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '12px' }}>{t('manageUsers.edit')}</button>
                         <button onClick={() => handleToggleActivation(user.id, user.active)} style={{ padding: '6px 12px', background: user.active ? '#ffc107' : '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '12px' }}>
-                          {user.active ? 'Deactivate' : 'Activate'}
+                          {user.active ? t('manageUsers.deactivate') : t('manageUsers.activate')}
                         </button>
-                        <button onClick={() => handleDeleteUser(user.id)} style={{ padding: '6px 12px', background: '#dc3545', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '12px' }}>Delete</button>
+                        <button onClick={() => handleDeleteUser(user.id)} style={{ padding: '6px 12px', background: '#dc3545', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '12px' }}>{t('manageUsers.delete')}</button>
                       </div>
                     </td>
                   </tr>
@@ -209,31 +211,31 @@ export default function ManageUsers() {
         {showAddModal && (
           <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
             <div style={{ background: 'white', padding: '30px', borderRadius: '10px', maxWidth: '500px', width: '90%' }}>
-              <h2 style={{ fontSize: '24px', marginBottom: '20px' }}>Add New User</h2>
+              <h2 style={{ fontSize: '24px', marginBottom: '20px' }}>{t('manageUsers.addUserTitle')}</h2>
               <form onSubmit={handleAddUser}>
                 <div style={{ marginBottom: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '600' }}>Name</label>
+                  <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '600' }}>{t('manageUsers.name')}</label>
                   <input type="text" value={newUser.name} onChange={(e) => setNewUser({...newUser, name: e.target.value})} required style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '5px' }} />
                 </div>
                 <div style={{ marginBottom: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '600' }}>Email</label>
+                  <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '600' }}>{t('manageUsers.email')}</label>
                   <input type="email" value={newUser.email} onChange={(e) => setNewUser({...newUser, email: e.target.value})} required style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '5px' }} />
                 </div>
                 <div style={{ marginBottom: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '600' }}>Password</label>
+                  <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '600' }}>{t('manageUsers.password')}</label>
                   <input type="password" value={newUser.password} onChange={(e) => setNewUser({...newUser, password: e.target.value})} required style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '5px' }} />
                 </div>
                 <div style={{ marginBottom: '20px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '600' }}>Role</label>
+                  <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '600' }}>{t('manageUsers.role')}</label>
                   <select value={newUser.role} onChange={(e) => setNewUser({...newUser, role: e.target.value})} style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '5px', cursor: 'pointer' }}>
-                    <option value="user">User</option>
-                    <option value="hr">HR</option>
-                    <option value="admin">Admin</option>
+                    <option value="user">{t('manageUsers.roleUser')}</option>
+                    <option value="hr">{t('manageUsers.roleHr')}</option>
+                    <option value="admin">{t('manageUsers.roleAdmin')}</option>
                   </select>
                 </div>
                 <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-                  <button type="button" onClick={() => { setShowAddModal(false); setNewUser({ name: '', email: '', password: '', role: 'user' }); }} style={{ padding: '10px 20px', background: '#6c757d', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>Cancel</button>
-                  <button type="submit" style={{ padding: '10px 20px', background: '#667eea', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>Add User</button>
+                  <button type="button" onClick={() => { setShowAddModal(false); setNewUser({ name: '', email: '', password: '', role: 'user' }); }} style={{ padding: '10px 20px', background: '#6c757d', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>{t('manageUsers.cancel')}</button>
+                  <button type="submit" style={{ padding: '10px 20px', background: '#667eea', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>{t('manageUsers.addUserButton')}</button>
                 </div>
               </form>
             </div>
@@ -244,27 +246,27 @@ export default function ManageUsers() {
         {showEditModal && selectedUser && (
           <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
             <div style={{ background: 'white', padding: '30px', borderRadius: '10px', maxWidth: '500px', width: '90%' }}>
-              <h2 style={{ fontSize: '24px', marginBottom: '20px' }}>Edit User</h2>
+              <h2 style={{ fontSize: '24px', marginBottom: '20px' }}>{t('manageUsers.editUserTitle')}</h2>
               <form onSubmit={handleUpdateUser}>
                 <div style={{ marginBottom: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '600' }}>Name</label>
+                  <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '600' }}>{t('manageUsers.name')}</label>
                   <input type="text" value={selectedUser.name || ''} onChange={(e) => setSelectedUser({...selectedUser, name: e.target.value})} required style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '5px' }} />
                 </div>
                 <div style={{ marginBottom: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '600' }}>Email</label>
+                  <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '600' }}>{t('manageUsers.email')}</label>
                   <input type="email" value={selectedUser.email} onChange={(e) => setSelectedUser({...selectedUser, email: e.target.value})} required style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '5px' }} />
                 </div>
                 <div style={{ marginBottom: '20px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '600' }}>Role</label>
+                  <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '600' }}>{t('manageUsers.role')}</label>
                   <select value={selectedUser.role} onChange={(e) => setSelectedUser({...selectedUser, role: e.target.value})} style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '5px', cursor: 'pointer' }}>
-                    <option value="user">User</option>
-                    <option value="hr">HR</option>
-                    <option value="admin">Admin</option>
+                    <option value="user">{t('manageUsers.roleUser')}</option>
+                    <option value="hr">{t('manageUsers.roleHr')}</option>
+                    <option value="admin">{t('manageUsers.roleAdmin')}</option>
                   </select>
                 </div>
                 <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-                  <button type="button" onClick={() => { setShowEditModal(false); setSelectedUser(null); }} style={{ padding: '10px 20px', background: '#6c757d', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>Cancel</button>
-                  <button type="submit" style={{ padding: '10px 20px', background: '#667eea', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>Update User</button>
+                  <button type="button" onClick={() => { setShowEditModal(false); setSelectedUser(null); }} style={{ padding: '10px 20px', background: '#6c757d', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>{t('manageUsers.cancel')}</button>
+                  <button type="submit" style={{ padding: '10px 20px', background: '#667eea', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>{t('manageUsers.updateUserButton')}</button>
                 </div>
               </form>
             </div>

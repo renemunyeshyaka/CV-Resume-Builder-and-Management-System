@@ -1,9 +1,11 @@
 import React, { useState, useRef } from 'react';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export default function FileUpload({ label, endpoint, field, onUploadSuccess })  {
+  const { t } = useTranslation();
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState('');
   const [preview, setPreview] = useState(null);
@@ -111,7 +113,7 @@ export default function FileUpload({ label, endpoint, field, onUploadSuccess }) 
           }
         });
 
-        setMessage('✓ Image uploaded successfully!');
+        setMessage(t('fileUpload.uploadSuccess'));
         setShowCropModal(false);
         setFile(null);
         setPreview(null);
@@ -122,7 +124,7 @@ export default function FileUpload({ label, endpoint, field, onUploadSuccess }) 
         }
         setTimeout(() => setMessage(''), 3000);
       } catch (err) {
-        setMessage('❌ Upload failed');
+        setMessage(t('fileUpload.uploadFailed'));
       }
     }, 'image/png');
   };
@@ -201,7 +203,7 @@ export default function FileUpload({ label, endpoint, field, onUploadSuccess }) 
               fontWeight: '700',
               color: '#333'
             }}>
-              ✂️ Crop & Resize Image
+              {t('fileUpload.cropTitle')}
             </h3>
 
             {/* Preview Canvas */}
@@ -225,7 +227,7 @@ export default function FileUpload({ label, endpoint, field, onUploadSuccess }) 
                 ref={imgRef}
                 src={preview}
                 style={{ display: 'none' }}
-                alt="preview"
+                alt={t('fileUpload.previewAlt')}
               />
             </div>
 
@@ -239,7 +241,7 @@ export default function FileUpload({ label, endpoint, field, onUploadSuccess }) 
                   color: '#333',
                   fontSize: '14px'
                 }}>
-                  📏 Scale: {scale}%
+                  {t('fileUpload.scaleLabel', { scale })}
                 </label>
                 <input
                   type="range"
@@ -266,7 +268,7 @@ export default function FileUpload({ label, endpoint, field, onUploadSuccess }) 
                   color: '#333',
                   fontSize: '14px'
                 }}>
-                  🔄 Rotation: {rotation}°
+                  {t('fileUpload.rotationLabel', { rotation })}
                 </label>
                 <div style={{
                   display: 'flex',
@@ -286,7 +288,7 @@ export default function FileUpload({ label, endpoint, field, onUploadSuccess }) 
                       fontWeight: '600'
                     }}
                   >
-                    ↺ Left
+                    {t('fileUpload.rotateLeft')}
                   </button>
                   <button
                     onClick={() => setRotation((rotation + 90) % 360)}
@@ -301,7 +303,7 @@ export default function FileUpload({ label, endpoint, field, onUploadSuccess }) 
                       fontWeight: '600'
                     }}
                   >
-                    Right ↻
+                    {t('fileUpload.rotateRight')}
                   </button>
                 </div>
                 <input
@@ -347,7 +349,7 @@ export default function FileUpload({ label, endpoint, field, onUploadSuccess }) 
                   fontSize: '14px'
                 }}
               >
-                ✕ Cancel
+                {t('fileUpload.cancel')}
               </button>
               <button
                 onClick={handleCropConfirm}
@@ -362,7 +364,7 @@ export default function FileUpload({ label, endpoint, field, onUploadSuccess }) 
                   fontSize: '14px'
                 }}
               >
-                ✓ Crop & Upload
+                {t('fileUpload.cropUpload')}
               </button>
             </div>
           </div>

@@ -1,7 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 
 const Home = () => {
+  const { t } = useTranslation();
   const canvasRef = useRef(null);
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
@@ -110,49 +113,49 @@ const Home = () => {
 
   const features = [
     {
-      title: 'Easy CV Builder',
-      description: 'Intuitive editor to create and update your CV with multiple sections and live preview.',
+      title: t('home.feature1Title'),
+      description: t('home.feature1Desc'),
       bgColor: '#e3f2fd',
       hoverColor: '#bbdefb'
     },
     {
-      title: 'Digital Security',
-      description: 'Sign your CV with electronic or digital signatures. Add watermarks, QR codes, and barcodes for verification.',
+      title: t('home.feature2Title'),
+      description: t('home.feature2Desc'),
       bgColor: '#f3e5f5',
       hoverColor: '#e1bee7'
     },
     {
-      title: 'Version Control',
-      description: 'Track changes and revisions. Download secure PDF versions for sharing and printing.',
+      title: t('home.feature3Title'),
+      description: t('home.feature3Desc'),
       bgColor: '#e8f5e9',
       hoverColor: '#c8e6c9'
     },
     {
-      title: 'Admin Management',
-      description: 'Admins can manage users, activate/deactivate accounts, and ensure system integrity.',
+      title: t('home.feature4Title'),
+      description: t('home.feature4Desc'),
       bgColor: '#fff3e0',
       hoverColor: '#ffe0b2'
     },
     {
-      title: 'Cloud Storage',
-      description: 'Securely store and access your CVs from anywhere. Automatic backups and version history.',
+      title: t('home.feature5Title'),
+      description: t('home.feature5Desc'),
       bgColor: '#fce4ec',
       hoverColor: '#f8bbd0'
     },
     {
-      title: 'Analytics & Reports',
-      description: 'Track CV downloads, views, and sharing statistics. Get insights into your document engagement.',
+      title: t('home.feature6Title'),
+      description: t('home.feature6Desc'),
       bgColor: '#ede7f6',
       hoverColor: '#ddd6f3'
     }
   ];
 
   const steps = [
-    'Register and activate your account via email.',
-    'Login with OTP for enhanced security.',
-    'Build and customize your CV with profile, sections, and signatures.',
-    'Generate secure PDFs with embedded QR/barcodes and watermarks.',
-    'Download, share, and verify your documents.'
+    t('home.step1'),
+    t('home.step2'),
+    t('home.step3'),
+    t('home.step4'),
+    t('home.step5')
   ];
 
   const styles = {
@@ -172,7 +175,7 @@ const Home = () => {
       top: 0,
       left: 0,
       right: 0,
-      background: 'rgba(102, 126, 234, 0.95)',
+      background: 'rgba(30, 60, 114, 0.95)',
       backdropFilter: 'blur(10px)',
       padding: isMobile ? '12px 15px' : isTablet ? '14px 20px' : '15px 30px',
       display: 'flex',
@@ -226,7 +229,7 @@ const Home = () => {
       top: isMobile ? '50px' : isTablet ? '55px' : '60px',
       left: 0,
       right: 0,
-      background: 'rgba(102, 126, 234, 0.98)',
+      background: 'rgba(30, 60, 114, 0.98)',
       backdropFilter: 'blur(10px)',
       display: menuOpen ? 'flex' : 'none',
       flexDirection: 'column',
@@ -264,7 +267,7 @@ const Home = () => {
     },
     container: {
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      background: 'linear-gradient(135deg, #1abc9c 0%, #16a085 100%)',
       padding: isMobile ? '70px 15px 0 15px' : isTablet ? '85px 20px 0 20px' : '120px 20px 0 20px',
       fontFamily: 'Arial, sans-serif',
       position: 'relative',
@@ -427,7 +430,7 @@ const Home = () => {
       display: 'block'
     },
     footer: {
-      background: 'rgba(0,0,0,0.3)',
+      background: '#1e3c72',
       color: '#fff',
       textAlign: 'center',
       padding: isMobile ? '20px 15px' : isTablet ? '25px 20px' : '30px 20px',
@@ -561,62 +564,65 @@ const Home = () => {
       {/* Fixed Top Menu */}
       <nav style={styles.navbar}>
         <Link href="/">
-          <span style={styles.navBrand}>CV Builder</span>
+          <span style={styles.navBrand}>{t('home.brandName')}</span>
         </Link>
         
-        {/* Desktop Navigation */}
-        <div style={styles.navLinks}>
-          <Link href="/" style={styles.navLink}
-            onMouseEnter={(e) => e.target.style.opacity = '0.7'}
-            onMouseLeave={(e) => e.target.style.opacity = '1'}
-          >
-            Home
-          </Link>
-          <a 
-            href="#features" 
-            style={styles.navLink}
-            onMouseEnter={(e) => e.target.style.opacity = '0.7'}
-            onMouseLeave={(e) => e.target.style.opacity = '1'}
-          >
-            Features
-          </a>
-          <a 
-            href="#how-it-works" 
-            style={styles.navLink}
-            onMouseEnter={(e) => e.target.style.opacity = '0.7'}
-            onMouseLeave={(e) => e.target.style.opacity = '1'}
-          >
-            How It Works
-          </a>
-          <a 
-            href="#contact" 
-            style={styles.navLink}
-            onMouseEnter={(e) => e.target.style.opacity = '0.7'}
-            onMouseLeave={(e) => e.target.style.opacity = '1'}
-          >
-            Contact Us
-          </a>
-          <Link href="/login-otp">
-            <span 
-              style={{...styles.button, ...styles.secondaryBtn}}
-              onMouseEnter={(e) => Object.assign(e.target.style, styles.buttonHover)}
-              onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
+        {/* Desktop Navigation - Right Aligned */}
+        <div style={{display: 'flex', alignItems: 'center', gap: '20px', marginLeft: 'auto'}}>
+          <div style={styles.navLinks}>
+            <Link href="/" style={styles.navLink}
+              onMouseEnter={(e) => e.target.style.opacity = '0.7'}
+              onMouseLeave={(e) => e.target.style.opacity = '1'}
             >
-              Login
-            </span>
-          </Link>
-          <Link href="/register">
-            <span 
-              style={{...styles.button, ...styles.primaryBtn}}
-              onMouseEnter={(e) => Object.assign(e.target.style, styles.buttonHover)}
-              onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
+              {t('nav.home')}
+            </Link>
+            <a 
+              href="#features" 
+              style={styles.navLink}
+              onMouseEnter={(e) => e.target.style.opacity = '0.7'}
+              onMouseLeave={(e) => e.target.style.opacity = '1'}
             >
-              Register
-            </span>
-          </Link>
+              {t('nav.features')}
+            </a>
+            <a 
+              href="#how-it-works" 
+              style={styles.navLink}
+              onMouseEnter={(e) => e.target.style.opacity = '0.7'}
+              onMouseLeave={(e) => e.target.style.opacity = '1'}
+            >
+              {t('nav.howItWorks')}
+            </a>
+            <a 
+              href="#contact" 
+              style={styles.navLink}
+              onMouseEnter={(e) => e.target.style.opacity = '0.7'}
+              onMouseLeave={(e) => e.target.style.opacity = '1'}
+            >
+              {t('nav.contactUs')}
+            </a>
+            <Link href="/login-otp">
+              <span 
+                style={{...styles.button, ...styles.secondaryBtn}}
+                onMouseEnter={(e) => Object.assign(e.target.style, styles.buttonHover)}
+                onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
+              >
+                {t('nav.login')}
+              </span>
+            </Link>
+            <Link href="/register">
+              <span 
+                style={{...styles.button, ...styles.primaryBtn}}
+                onMouseEnter={(e) => Object.assign(e.target.style, styles.buttonHover)}
+                onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
+              >
+                {t('nav.register')}
+              </span>
+            </Link>
+          </div>
+          <LanguageSwitcher />
         </div>
 
-        {/* Hamburger Menu Button */}
+        {/* Hamburger Menu Button (Mobile/Tablet only) */}
         <button 
           style={styles.hamburgerBtn}
           onClick={() => setMenuOpen(!menuOpen)}
@@ -646,28 +652,28 @@ const Home = () => {
       {/* Mobile/Tablet Dropdown Menu */}
       <div style={styles.mobileMenu}>
         <Link href="/" style={styles.mobileLink} onClick={() => setMenuOpen(false)}>
-          Home
+          {t('nav.home')}
         </Link>
         <a 
           href="#features" 
           style={styles.mobileLink}
           onClick={() => setMenuOpen(false)}
         >
-          Features
+          {t('nav.features')}
         </a>
         <a 
           href="#how-it-works" 
           style={styles.mobileLink}
           onClick={() => setMenuOpen(false)}
         >
-          How It Works
+          {t('nav.howItWorks')}
         </a>
         <a 
           href="#contact" 
           style={styles.mobileLink}
           onClick={() => setMenuOpen(false)}
         >
-          Contact Us
+          {t('nav.contactUs')}
         </a>
         <div style={styles.mobileButtonGroup}>
           <Link href="/login-otp" onClick={() => setMenuOpen(false)}>
@@ -676,7 +682,7 @@ const Home = () => {
               onMouseEnter={(e) => e.target.style.opacity = '0.8'}
               onMouseLeave={(e) => e.target.style.opacity = '1'}
             >
-              Login
+              {t('nav.login')}
             </button>
           </Link>
           <Link href="/register" onClick={() => setMenuOpen(false)}>
@@ -685,7 +691,7 @@ const Home = () => {
               onMouseEnter={(e) => e.target.style.opacity = '0.9'}
               onMouseLeave={(e) => e.target.style.opacity = '1'}
             >
-              Register
+              {t('nav.register')}
             </button>
           </Link>
         </div>
@@ -694,8 +700,8 @@ const Home = () => {
       <div style={styles.container}>
         {/* Header */}
         <div style={styles.header}>
-          <h1 style={styles.title}>CV/Resume Builder</h1>
-          <p style={styles.subtitle}>Build, Sign, and Manage Your Professional Documents</p>
+          <h1 style={styles.title}>{t('home.title')}</h1>
+          <p style={styles.subtitle}>{t('home.subtitle')}</p>
           <div style={styles.ctaButtons}>
             <Link href="/register">
               <button 
@@ -703,7 +709,7 @@ const Home = () => {
                 onMouseEnter={(e) => Object.assign(e.target.style, styles.buttonHover)}
                 onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
               >
-                Get Started
+                {t('home.ctaRegister')}
               </button>
             </Link>
             <Link href="/login-otp">
@@ -712,7 +718,7 @@ const Home = () => {
                 onMouseEnter={(e) => Object.assign(e.target.style, styles.buttonHover)}
                 onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
               >
-                Login
+                {t('home.ctaLogin')}
               </button>
             </Link>
           </div>
@@ -720,7 +726,7 @@ const Home = () => {
 
         {/* Features Section */}
         <div style={styles.featuresSection} id="features">
-          <h2 style={styles.sectionTitle}>Key Features</h2>
+          <h2 style={styles.sectionTitle}>{t('home.keyFeatures')}</h2>
           <div style={styles.featuresGrid}>
             {features.map((feature, index) => (
               <div
@@ -749,7 +755,7 @@ const Home = () => {
 
         {/* How It Works Section */}
         <div style={styles.howWorksSection} id="how-it-works">
-          <h2 style={styles.howWorksTitle}>How It Works</h2>
+          <h2 style={styles.howWorksTitle}>{t('home.howItWorksTitle')}</h2>
           <div style={styles.howWorksContent}>
             <div>
               <div style={styles.stepsList}>
@@ -765,7 +771,7 @@ const Home = () => {
             <div style={styles.cvTemplate}>
               <img
                 src="/cv-template.webp"
-                alt="CV template preview"
+                alt={t('home.cvTemplateAlt')}
                 style={styles.cvImage}
               />
             </div>
@@ -774,15 +780,15 @@ const Home = () => {
 
         {/* Contact Us Section */}
         <div style={styles.contactSection} id="contact">
-          <h2 style={styles.contactTitle}>Get in Touch</h2>
+          <h2 style={styles.contactTitle}>{t('home.getInTouch')}</h2>
           <div style={styles.contactContent}>
             <form style={styles.contactForm} onSubmit={(e) => {
               e.preventDefault();
-              alert('Thank you for your message! We will get back to you soon.');
+              alert(t('home.thankYouMessage'));
             }}>
               <input
                 type="text"
-                placeholder="Your Name"
+                placeholder={t('home.yourName')}
                 style={styles.contactInput}
                 onFocus={(e) => e.target.style.borderColor = '#667eea'}
                 onBlur={(e) => e.target.style.borderColor = '#e0e0e0'}
@@ -790,7 +796,7 @@ const Home = () => {
               />
               <input
                 type="email"
-                placeholder="Your Email"
+                placeholder={t('home.yourEmail')}
                 style={styles.contactInput}
                 onFocus={(e) => e.target.style.borderColor = '#667eea'}
                 onBlur={(e) => e.target.style.borderColor = '#e0e0e0'}
@@ -798,14 +804,14 @@ const Home = () => {
               />
               <input
                 type="text"
-                placeholder="Subject"
+                placeholder={t('home.subject')}
                 style={styles.contactInput}
                 onFocus={(e) => e.target.style.borderColor = '#667eea'}
                 onBlur={(e) => e.target.style.borderColor = '#e0e0e0'}
                 required
               />
               <textarea
-                placeholder="Your Message"
+                placeholder={t('home.yourMessage')}
                 style={styles.contactTextarea}
                 onFocus={(e) => e.target.style.borderColor = '#667eea'}
                 onBlur={(e) => e.target.style.borderColor = '#e0e0e0'}
@@ -823,7 +829,7 @@ const Home = () => {
                   e.target.style.transform = 'translateY(0)';
                 }}
               >
-                Send Message
+                {t('home.sendMessage')}
               </button>
             </form>
 
@@ -831,32 +837,32 @@ const Home = () => {
               <div style={styles.contactInfoItem}>
                 <div style={styles.contactIcon}>📧</div>
                 <div style={styles.contactInfoText}>
-                  <span style={styles.contactLabel}>Email</span>
-                  <span style={styles.contactValue}>support@cvbuilder.com</span>
+                  <span style={styles.contactLabel}>{t('home.email')}</span>
+                  <span style={styles.contactValue}>{t('home.contactEmail')}</span>
                 </div>
               </div>
 
               <div style={styles.contactInfoItem}>
                 <div style={styles.contactIcon}>📱</div>
                 <div style={styles.contactInfoText}>
-                  <span style={styles.contactLabel}>Phone</span>
-                  <span style={styles.contactValue}>+250 788 620 201</span>
+                  <span style={styles.contactLabel}>{t('home.phone')}</span>
+                  <span style={styles.contactValue}>{t('home.contactPhone')}</span>
                 </div>
               </div>
 
               <div style={styles.contactInfoItem}>
                 <div style={styles.contactIcon}>📍</div>
                 <div style={styles.contactInfoText}>
-                  <span style={styles.contactLabel}>Address</span>
-                  <span style={styles.contactValue}>Kigali, Rwanda</span>
+                  <span style={styles.contactLabel}>{t('home.address')}</span>
+                  <span style={styles.contactValue}>{t('home.contactAddress')}</span>
                 </div>
               </div>
 
               <div style={styles.contactInfoItem}>
                 <div style={styles.contactIcon}>🕐</div>
                 <div style={styles.contactInfoText}>
-                  <span style={styles.contactLabel}>Business Hours</span>
-                  <span style={styles.contactValue}>Monday - Friday: 9:00 AM - 6:00 PM (EAT)</span>
+                  <span style={styles.contactLabel}>{t('home.businessHours')}</span>
+                  <span style={styles.contactValue}>{t('home.businessHoursValue')}</span>
                 </div>
               </div>
             </div>
@@ -866,20 +872,20 @@ const Home = () => {
         {/* Footer */}
         <footer style={styles.footer}>
           <p style={styles.footerText}>
-            © 2026 CV/Resume Builder and Management System. All rights reserved.
+            {t('home.footerCopyright')}
           </p>
           <div style={styles.footerLinks}>
             <Link href="/privacy-policy" style={styles.footerLink}
               onMouseEnter={(e) => e.target.style.opacity = '0.7'}
               onMouseLeave={(e) => e.target.style.opacity = '0.9'}
             >
-              Privacy Policy
+              {t('home.privacyPolicy')}
             </Link>
             <Link href="/terms-of-service" style={styles.footerLink}
               onMouseEnter={(e) => e.target.style.opacity = '0.7'}
               onMouseLeave={(e) => e.target.style.opacity = '0.9'}
             >
-              Terms of Service
+              {t('home.termsOfService')}
             </Link>
             <a 
               href="#contact" 
@@ -887,7 +893,7 @@ const Home = () => {
               onMouseEnter={(e) => e.target.style.opacity = '0.7'}
               onMouseLeave={(e) => e.target.style.opacity = '0.9'}
             >
-              Contact Us
+              {t('nav.contactUs')}
             </a>
           </div>
         </footer>

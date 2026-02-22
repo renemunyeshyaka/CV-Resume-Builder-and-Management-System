@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export default function MyCVs() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [cvs, setCvs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -29,13 +31,13 @@ export default function MyCVs() {
       setCvs(response.data);
       setLoading(false);
     } catch (err) {
-      setError('Failed to load your CVs');
+      setError(t('myCvs.loadError'));
       setLoading(false);
     }
   };
 
   const handleDelete = async (cvId) => {
-    if (!window.confirm('Are you sure you want to delete this CV?')) return;
+    if (!window.confirm(t('myCvs.deleteConfirm'))) return;
 
     setDeletingId(cvId);
     try {
@@ -45,7 +47,7 @@ export default function MyCVs() {
       });
       setCvs(cvs.filter(cv => cv.id !== cvId));
     } catch (err) {
-      alert('Failed to delete CV');
+      alert(t('myCvs.deleteError'));
     } finally {
       setDeletingId(null);
     }
@@ -62,7 +64,7 @@ export default function MyCVs() {
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', fontSize: '18px', color: '#667eea' }}>
-        Loading your CVs...
+        {t('myCvs.loading')}
       </div>
     );
   }
@@ -74,10 +76,10 @@ export default function MyCVs() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
           <div>
             <h1 style={{ fontSize: '32px', fontWeight: '700', color: '#333', margin: '0 0 10px 0' }}>
-              📄 My CVs
+              📄 {t('myCvs.title')}
             </h1>
             <p style={{ color: '#666', fontSize: '16px', margin: 0 }}>
-              Manage and edit your professional resumes
+              {t('myCvs.subtitle')}
             </p>
           </div>
           <div style={{ display: 'flex', gap: '10px' }}>
@@ -97,7 +99,7 @@ export default function MyCVs() {
               onMouseOver={(e) => e.target.style.background = '#d8d8d8'}
               onMouseOut={(e) => e.target.style.background = '#e8e8e8'}
             >
-              ← Back
+              ← {t('myCvs.back')}
             </button>
             <button
               onClick={() => router.push('/create-cv')}
@@ -115,7 +117,7 @@ export default function MyCVs() {
               onMouseOver={(e) => e.target.style.background = '#5568d3'}
               onMouseOut={(e) => e.target.style.background = '#667eea'}
             >
-              + Create New CV
+              + {t('myCvs.createNew')}
             </button>
           </div>
         </div>
@@ -145,10 +147,10 @@ export default function MyCVs() {
           }}>
             <div style={{ fontSize: '48px', marginBottom: '20px' }}>📝</div>
             <h3 style={{ fontSize: '20px', fontWeight: '700', color: '#333', marginBottom: '10px' }}>
-              No CVs Yet
+              {t('myCvs.emptyTitle')}
             </h3>
             <p style={{ color: '#666', fontSize: '16px', marginBottom: '30px' }}>
-              You haven't created any CVs yet. Start building your professional resume today!
+              {t('myCvs.emptyBody')}
             </p>
             <button
               onClick={() => router.push('/create-cv')}
@@ -166,7 +168,7 @@ export default function MyCVs() {
               onMouseOver={(e) => e.target.style.transform = 'translateY(-2px)'}
               onMouseOut={(e) => e.target.style.transform = 'translateY(0)'}
             >
-              Create Your First CV
+              {t('myCvs.emptyCta')}
             </button>
           </div>
         ) : (
@@ -195,7 +197,7 @@ export default function MyCVs() {
                     {cv.title}
                   </h3>
                   <p style={{ margin: '0', fontSize: '12px', opacity: 0.9 }}>
-                    Version {cv.version}
+                    {t('myCvs.versionLabel')} {cv.version}
                   </p>
                 </div>
 
@@ -203,7 +205,7 @@ export default function MyCVs() {
                 <div style={{ padding: '20px' }}>
                   <div style={{ marginBottom: '15px' }}>
                     <p style={{ margin: '0 0 5px 0', fontSize: '12px', color: '#666', fontWeight: '600' }}>
-                      Created
+                      {t('myCvs.createdLabel')}
                     </p>
                     <p style={{ margin: '0', fontSize: '14px', color: '#333' }}>
                       {new Date(cv.created_at).toLocaleDateString('en-US', {
@@ -216,7 +218,7 @@ export default function MyCVs() {
 
                   <div style={{ marginBottom: '15px' }}>
                     <p style={{ margin: '0 0 5px 0', fontSize: '12px', color: '#666', fontWeight: '600' }}>
-                      Last Updated
+                      {t('myCvs.updatedLabel')}
                     </p>
                     <p style={{ margin: '0', fontSize: '14px', color: '#333' }}>
                       {new Date(cv.updated_at).toLocaleDateString('en-US', {
@@ -230,7 +232,7 @@ export default function MyCVs() {
                   {cv.pdf_path && (
                     <div style={{ marginBottom: '20px', padding: '10px', background: '#f0fdf4', borderRadius: '4px', borderLeft: '3px solid #28a745' }}>
                       <p style={{ margin: '0', fontSize: '12px', color: '#155724', fontWeight: '600' }}>
-                        ✓ PDF Generated
+                        {t('myCvs.pdfGenerated')}
                       </p>
                     </div>
                   )}
@@ -255,7 +257,7 @@ export default function MyCVs() {
                     onMouseOver={(e) => e.target.style.background = '#5568d3'}
                     onMouseOut={(e) => e.target.style.background = '#667eea'}
                   >
-                    ✏️ Edit
+                    ✏️ {t('myCvs.edit')}
                   </button>
 
                   <button
@@ -275,7 +277,7 @@ export default function MyCVs() {
                     onMouseOver={(e) => e.target.style.background = '#ffb300'}
                     onMouseOut={(e) => e.target.style.background = '#ffc107'}
                   >
-                    👁️ Preview
+                    👁️ {t('myCvs.preview')}
                   </button>
 
                   <button
@@ -296,7 +298,7 @@ export default function MyCVs() {
                     onMouseOver={(e) => !deletingId && (e.target.style.background = '#c82333')}
                     onMouseOut={(e) => !deletingId && (e.target.style.background = '#dc3545')}
                   >
-                    {deletingId === cv.id ? '⏳ Deleting...' : '🗑️ Delete'}
+                    {deletingId === cv.id ? `⏳ ${t('messages.deleting')}` : `🗑️ ${t('myCvs.delete')}`}
                   </button>
                 </div>
               </div>

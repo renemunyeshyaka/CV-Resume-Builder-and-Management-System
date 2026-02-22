@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export default function UserDashboard() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [cvCount, setCvCount] = useState(0);
@@ -47,7 +49,7 @@ export default function UserDashboard() {
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', fontSize: '18px', color: '#667eea' }}>
-        Loading...
+        {t('messages.loading')}
       </div>
     );
   }
@@ -59,9 +61,9 @@ export default function UserDashboard() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
           <div>
             <h1 style={{ fontSize: '32px', fontWeight: '700', color: '#333', margin: '0 0 10px 0' }}>
-              Dashboard
+              {t('dashboard.userDashboard')}
             </h1>
-            <p style={{ color: '#666', fontSize: '16px', margin: 0 }}>Welcome back, {user?.name || user?.email}!</p>
+            <p style={{ color: '#666', fontSize: '16px', margin: 0 }}>{t('dashboard.welcomeBack')}, {user?.name || user?.email}!</p>
           </div>
           <button
             onClick={handleLogout}
@@ -79,7 +81,7 @@ export default function UserDashboard() {
             onMouseOver={(e) => e.target.style.background = '#c82333'}
             onMouseOut={(e) => e.target.style.background = '#dc3545'}
           >
-            🚪 Logout
+            🚪 {t('nav.logout')}
           </button>
         </div>
 
@@ -93,11 +95,10 @@ export default function UserDashboard() {
           borderLeft: '4px solid #667eea'
         }}>
           <h2 style={{ fontSize: '22px', marginBottom: '15px', color: '#333' }}>
-            👋 Welcome, {user?.name || user?.email}!
+            👋 {t('dashboard.welcomeBack')}, {user?.name || user?.email}!
           </h2>
           <p style={{ color: '#666', fontSize: '15px', lineHeight: '1.6', margin: 0 }}>
-            Create and manage your professional CVs with ease. Use our intuitive CV builder to craft compelling resumes
-            that showcase your skills and experience. You currently have <strong>{cvCount}</strong> CV{cvCount !== 1 ? 's' : ''}.
+            {t('userDashboard.welcomeBody', { count: cvCount, plural: cvCount !== 1 ? 's' : '' })}
           </p>
         </div>
 
@@ -126,9 +127,9 @@ export default function UserDashboard() {
             }}
           >
             <div style={{ fontSize: '40px', marginBottom: '15px' }}>📝</div>
-            <h3 style={{ fontSize: '20px', marginBottom: '10px', fontWeight: '700' }}>Create New CV</h3>
+            <h3 style={{ fontSize: '20px', marginBottom: '10px', fontWeight: '700' }}>{t('userDashboard.createNewCV')}</h3>
             <p style={{ margin: '0', fontSize: '14px', opacity: 0.95 }}>
-              Build a professional resume from scratch with our guided editor
+              {t('userDashboard.createNewCVDesc')}
             </p>
           </div>
 
@@ -154,12 +155,12 @@ export default function UserDashboard() {
             }}
           >
             <div style={{ fontSize: '40px', marginBottom: '15px' }}>📄</div>
-            <h3 style={{ fontSize: '20px', marginBottom: '10px', fontWeight: '700', color: '#333' }}>My CVs</h3>
+            <h3 style={{ fontSize: '20px', marginBottom: '10px', fontWeight: '700', color: '#333' }}>{t('userDashboard.myCVs')}</h3>
             <p style={{ margin: '0', fontSize: '14px', color: '#666' }}>
-              View, edit, and manage all your saved resumes
+              {t('userDashboard.myCVsDesc')}
             </p>
             <div style={{ marginTop: '15px', fontSize: '12px', color: '#667eea', fontWeight: '600' }}>
-              {cvCount} CV{cvCount !== 1 ? 's' : ''} saved
+              {t('userDashboard.myCVsSaved', { count: cvCount, plural: cvCount !== 1 ? 's' : '' })}
             </div>
           </div>
 
@@ -185,9 +186,9 @@ export default function UserDashboard() {
             }}
           >
             <div style={{ fontSize: '40px', marginBottom: '15px' }}>👤</div>
-            <h3 style={{ fontSize: '20px', marginBottom: '10px', fontWeight: '700', color: '#333' }}>Profile</h3>
+            <h3 style={{ fontSize: '20px', marginBottom: '10px', fontWeight: '700', color: '#333' }}>{t('userDashboard.profile')}</h3>
             <p style={{ margin: '0', fontSize: '14px', color: '#666' }}>
-              Update your personal information and preferences
+              {t('userDashboard.profileDesc')}
             </p>
           </div>
         </div>
@@ -201,16 +202,16 @@ export default function UserDashboard() {
           marginBottom: '40px'
         }}>
           <h3 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '20px', color: '#333' }}>
-            ⚡ Quick Tips for Professional CVs
+            ⚡ {t('userDashboard.tipsTitle')}
           </h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
             {[
-              { icon: '✓', title: 'Clear Structure', desc: 'Organize information logically with clear headings' },
-              { icon: '✓', title: 'Professional Language', desc: 'Use formal, business-appropriate language' },
-              { icon: '✓', title: 'Quantify Achievements', desc: 'Include metrics and specific results' },
-              { icon: '✓', title: 'Relevant Skills', desc: 'Highlight skills matching job requirements' },
-              { icon: '✓', title: 'Proper Formatting', desc: 'Maintain consistent fonts and spacing' },
-              { icon: '✓', title: 'Proofread Carefully', desc: 'Eliminate all spelling and grammar errors' }
+              { icon: '✓', title: t('userDashboard.tip1Title'), desc: t('userDashboard.tip1Desc') },
+              { icon: '✓', title: t('userDashboard.tip2Title'), desc: t('userDashboard.tip2Desc') },
+              { icon: '✓', title: t('userDashboard.tip3Title'), desc: t('userDashboard.tip3Desc') },
+              { icon: '✓', title: t('userDashboard.tip4Title'), desc: t('userDashboard.tip4Desc') },
+              { icon: '✓', title: t('userDashboard.tip5Title'), desc: t('userDashboard.tip5Desc') },
+              { icon: '✓', title: t('userDashboard.tip6Title'), desc: t('userDashboard.tip6Desc') }
             ].map((tip, idx) => (
               <div key={idx} style={{ padding: '15px', background: '#f8f9fa', borderRadius: '6px', borderLeft: '3px solid #667eea' }}>
                 <h4 style={{ margin: '0 0 8px 0', color: '#333', fontSize: '15px', fontWeight: '600' }}>
@@ -235,8 +236,7 @@ export default function UserDashboard() {
           fontSize: '13px'
         }}>
           <p style={{ margin: 0 }}>
-            💡 Pro Tip: Your CVs are securely stored and can be exported as PDFs with professional formatting.
-            You can edit your CVs anytime and track all changes with version history.
+            💡 {t('userDashboard.proTip')}
           </p>
         </div>
       </div>

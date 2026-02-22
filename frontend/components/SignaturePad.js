@@ -1,6 +1,8 @@
 import React, { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function SignaturePad({ onSave }) {
+  const { t } = useTranslation();
   const canvasRef = useRef(null);
 
   const startDrawing = (e) => {
@@ -46,8 +48,8 @@ export default function SignaturePad({ onSave }) {
         onMouseLeave={stopDrawing}
       />
       <div>
-        <button onClick={handleSave}>Save Signature</button>
-        <button onClick={handleClear}>Clear</button>
+        <button onClick={handleSave}>{t('signaturePad.save')}</button>
+        <button onClick={handleClear}>{t('signaturePad.clear')}</button>
       </div>
     </div>
   );

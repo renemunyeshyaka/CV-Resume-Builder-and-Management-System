@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 import CVEditor from '../../components/CVEditor';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export default function EditCV() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { id } = router.query;
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -43,7 +45,7 @@ export default function EditCV() {
       setCvTitle(response.data.title);
       setLoading(false);
     } catch (err) {
-      const errorMessage = err.response?.data?.error || 'Failed to load CV. Please try again.';
+      const errorMessage = err.response?.data?.error || t('editCv.loadError');
       setError(errorMessage);
       setLoading(false);
       
@@ -74,13 +76,13 @@ export default function EditCV() {
         }
       );
 
-      setSuccess('✓ CV updated successfully!');
+      setSuccess(t('editCv.updateSuccess'));
       setCvData(response.data.content);
       setTimeout(() => {
         router.push('/my-cvs');
       }, 1500);
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to update CV. Please try again.');
+      setError(err.response?.data?.error || t('editCv.updateError'));
     } finally {
       setSaving(false);
     }
@@ -89,7 +91,7 @@ export default function EditCV() {
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', fontSize: '18px', color: '#667eea' }}>
-        Loading CV...
+        {t('editCv.loading')}
       </div>
     );
   }
@@ -98,9 +100,9 @@ export default function EditCV() {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
         <div style={{ textAlign: 'center', padding: '20px', maxWidth: '500px' }}>
-          <h2 style={{ color: '#e74c3c' }}>Error</h2>
+          <h2 style={{ color: '#e74c3c' }}>{t('editCv.errorTitle')}</h2>
           <p style={{ color: '#666', marginBottom: '20px' }}>{error}</p>
-          <p style={{ color: '#999', fontSize: '14px' }}>Redirecting to My CVs...</p>
+          <p style={{ color: '#999', fontSize: '14px' }}>{t('editCv.redirecting')}</p>
         </div>
       </div>
     );
@@ -113,10 +115,10 @@ export default function EditCV() {
         <div style={{ marginBottom: '30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <h1 style={{ fontSize: '32px', fontWeight: '700', margin: '0 0 10px 0', color: '#333' }}>
-              ✏️ Edit Your CV
+              ✏️ {t('editCv.title')}
             </h1>
             <p style={{ fontSize: '16px', color: '#666', margin: 0 }}>
-              Update your professional resume
+              {t('editCv.subtitle')}
             </p>
           </div>
           <button
@@ -132,7 +134,7 @@ export default function EditCV() {
               color: '#333'
             }}
           >
-            ← Back to My CVs
+            ← {t('editCv.backToMyCvs')}
           </button>
         </div>
 
@@ -145,7 +147,7 @@ export default function EditCV() {
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)' 
         }}>
           <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#333' }}>
-            CV Title
+            {t('editCv.cvTitleLabel')}
           </label>
           <input
             type="text"
@@ -160,7 +162,7 @@ export default function EditCV() {
               boxSizing: 'border-box',
               fontFamily: 'inherit'
             }}
-            placeholder="e.g., Senior Developer CV"
+            placeholder={t('editCv.cvTitlePlaceholder')}
           />
         </div>
 

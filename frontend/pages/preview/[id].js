@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export default function CVPreview() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { id } = router.query;
   const [cv, setCV] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -35,7 +37,7 @@ export default function CVPreview() {
       setCV(response.data);
       setLoading(false);
     } catch (err) {
-      setError('Failed to load CV preview');
+      setError(t('preview.loadError'));
       setLoading(false);
     }
   };
@@ -54,11 +56,11 @@ export default function CVPreview() {
         }
       );
 
-      setSignMessage('✓ CV signed successfully with QR code, barcode, and watermark!');
+      setSignMessage(t('preview.signSuccess'));
       // Refresh CV data to show signed status
       await fetchCV(token, id);
     } catch (err) {
-      setSignMessage('✗ Failed to sign CV: ' + (err.response?.data?.error || err.message));
+      setSignMessage(t('preview.signErrorPrefix') + (err.response?.data?.error || err.message));
     } finally {
       setSigning(false);
     }
@@ -68,7 +70,7 @@ export default function CVPreview() {
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', fontSize: '18px', color: '#667eea' }}>
-        Loading CV preview...
+        {t('preview.loading')}
       </div>
     );
   }
@@ -76,7 +78,7 @@ export default function CVPreview() {
   if (error || !cv) {
     return (
       <div style={{ padding: '40px', textAlign: 'center' }}>
-        <h2>{error || 'CV not found'}</h2>
+        <h2>{error || t('preview.notFound')}</h2>
         <button
           onClick={() => router.push('/my-cvs')}
           style={{
@@ -90,7 +92,7 @@ export default function CVPreview() {
             fontWeight: '600'
           }}
         >
-          Back to My CVs
+          {t('preview.backToMyCvs')}
         </button>
       </div>
     );
@@ -109,7 +111,7 @@ export default function CVPreview() {
   };
 
   // Determine profile picture (real or avatar)
-  const fullName = content?.fullName || cv.name || 'User';
+  const fullName = content?.fullName || cv.name || t('preview.yourName');
   const profilePicture = cv.profile_picture;
   const initials = fullName
     .split(' ')
@@ -133,10 +135,10 @@ export default function CVPreview() {
         {/* Header Controls */}
         <div style={{ marginBottom: '30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '15px' }}>
           <h1 style={{ fontSize: '28px', fontWeight: '700', color: '#333', margin: 0 }}>
-            📋 Preview - {cv.title}
+            📋 {t('preview.previewTitle')} - {cv.title}
             {cv.status === 'signed' && (
               <span style={{ marginLeft: '15px', fontSize: '14px', color: '#10b981', fontWeight: '600', background: '#d1fae5', padding: '5px 12px', borderRadius: '20px' }}>
-                ✓ Signed
+                {t('preview.signed')}
               </span>
             )}
           </h1>
@@ -157,7 +159,7 @@ export default function CVPreview() {
               onMouseOver={(e) => e.target.style.background = '#d8d8d8'}
               onMouseOut={(e) => e.target.style.background = '#e8e8e8'}
             >
-              Back
+              {t('preview.back')}
             </button>
             {cv.status !== 'signed' && (
               <button
@@ -177,7 +179,7 @@ export default function CVPreview() {
                 onMouseOver={(e) => !signing && (e.target.style.background = '#059669')}
                 onMouseOut={(e) => !signing && (e.target.style.background = '#10b981')}
               >
-                {signing ? '⏳ Signing...' : '✍️ Sign CV'}
+                {signing ? `⏳ ${t('preview.signing')}` : `✍️ ${t('preview.signButton')}`}
               </button>
             )}
             <button
@@ -196,7 +198,7 @@ export default function CVPreview() {
               onMouseOver={(e) => e.target.style.background = '#5568d3'}
               onMouseOut={(e) => e.target.style.background = '#667eea'}
             >
-              🖨️ Print/Save as PDF
+              🖨️ {t('preview.printSave')}
             </button>
           </div>
         </div>
@@ -290,7 +292,7 @@ export default function CVPreview() {
           {content?.summary && (
             <div className="cv-section" style={{ marginBottom: '35px' }}>
               <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#667eea', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                Professional Summary
+                {t('preview.summaryTitle')}
               </h2>
               <p style={{ margin: '0', color: '#555', lineHeight: '1.8' }}>
                 {content.summary}
@@ -302,7 +304,7 @@ export default function CVPreview() {
           {content?.experience && content.experience.length > 0 && (
             <div className="cv-section" style={{ marginBottom: '35px' }}>
               <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#667eea', marginBottom: '15px', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                Work Experience
+                {t('preview.experienceTitle')}
               </h2>
               {content.experience.map((exp, idx) => (
                 exp.company && (
@@ -331,7 +333,7 @@ export default function CVPreview() {
           {content?.education && content.education.length > 0 && (
             <div className="cv-section" style={{ marginBottom: '35px' }}>
               <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#667eea', marginBottom: '15px', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                Education
+                {t('preview.educationTitle')}
               </h2>
               {content.education.map((edu, idx) => (
                 edu.institution && (
@@ -357,7 +359,7 @@ export default function CVPreview() {
           {content?.skills && content.skills.length > 0 && (
             <div className="cv-section" style={{ marginBottom: '35px' }}>
               <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#667eea', marginBottom: '15px', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                Skills
+                {t('preview.skillsTitle')}
               </h2>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                 {content.skills.map((skill, idx) => (
@@ -386,7 +388,7 @@ export default function CVPreview() {
           {content?.projects && content.projects.length > 0 && (
             <div className="cv-section" style={{ marginBottom: '35px' }}>
               <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#667eea', marginBottom: '15px', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                Projects
+                {t('preview.projectsTitle')}
               </h2>
               {content.projects.map((proj, idx) => (
                 proj.title && (
@@ -412,7 +414,7 @@ export default function CVPreview() {
           {content?.certifications && content.certifications.length > 0 && (
             <div className="cv-section" style={{ marginBottom: '35px' }}>
               <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#667eea', marginBottom: '15px', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                Certifications
+                {t('preview.certificationsTitle')}
               </h2>
               {content.certifications.map((cert, idx) => (
                 cert.name && (
@@ -429,7 +431,7 @@ export default function CVPreview() {
           {content?.languages && content.languages.length > 0 && (
             <div className="cv-section">
               <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#667eea', marginBottom: '15px', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                Languages
+                {t('preview.languagesTitle')}
               </h2>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
                 {content.languages.map((lang, idx) => (
@@ -441,8 +443,8 @@ export default function CVPreview() {
                 ))}
               </div>
               <div style={{ marginTop: '16px', fontSize: '13px', color: '#555' }}>
-                <div><strong>Date & Time:</strong> {formattedDateTime}</div>
-                <div><strong>Full Name:</strong> {fullName}</div>
+                <div><strong>{t('preview.dateTimeLabel')}:</strong> {formattedDateTime}</div>
+                <div><strong>{t('preview.fullNameLabel')}:</strong> {fullName}</div>
               </div>
             </div>
           )}
@@ -467,7 +469,7 @@ export default function CVPreview() {
             onMouseOver={(e) => e.target.style.background = '#5568d3'}
             onMouseOut={(e) => e.target.style.background = '#667eea'}
           >
-            ✏️ Edit CV
+            ✏️ {t('preview.editCv')}
           </button>
           <button
             onClick={() => router.push('/my-cvs')}
@@ -485,7 +487,7 @@ export default function CVPreview() {
             onMouseOver={(e) => e.target.style.background = '#d8d8d8'}
             onMouseOut={(e) => e.target.style.background = '#e8e8e8'}
           >
-            Back to My CVs
+            {t('preview.backToMyCvsFooter')}
           </button>
         </div>
       </div>

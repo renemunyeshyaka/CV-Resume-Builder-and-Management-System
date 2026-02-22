@@ -2,10 +2,12 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export default function Register() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -18,13 +20,13 @@ export default function Register() {
 
   const validate = () => {
     const errors = {};
-    if (!name.trim()) errors.name = 'Name is required.';
-    if (!email.trim()) errors.email = 'Email is required.';
-    else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) errors.email = 'Invalid email address.';
-    if (!password) errors.password = 'Password is required.';
-    else if (password.length < 6) errors.password = 'Password must be at least 6 characters.';
-    if (!agreePrivacy) errors.agreePrivacy = 'You must accept the Privacy Policy.';
-    if (!agreeTerms) errors.agreeTerms = 'You must accept the Terms of Service.';
+    if (!name.trim()) errors.name = t('register.nameRequired');
+    if (!email.trim()) errors.email = t('register.emailRequired');
+    else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) errors.email = t('register.emailInvalid');
+    if (!password) errors.password = t('register.passwordRequired');
+    else if (password.length < 6) errors.password = t('register.passwordMin');
+    if (!agreePrivacy) errors.agreePrivacy = t('register.privacyRequired');
+    if (!agreeTerms) errors.agreeTerms = t('register.termsRequired');
     return errors;
   };
 
@@ -38,12 +40,12 @@ export default function Register() {
     setLoading(true);
     try {
       await axios.post(`${API_URL}/api/auth/register`, { email, password, name });
-      setSuccess('Registration successful! You can now log in.');
+      setSuccess(t('register.successMessage'));
       setEmail(''); setPassword(''); setName('');
       setAgreePrivacy(false);
       setAgreeTerms(false);
     } catch (err) {
-      setError(err.response?.data?.error || 'Registration failed');
+      setError(err.response?.data?.error || t('register.errorMessage'));
     }
     setLoading(false);
   };
@@ -60,12 +62,12 @@ export default function Register() {
       flexDirection: 'column',
       alignItems: 'center'
     }}>
-      <h2 style={{ color: '#2a7ae2', marginBottom: 24 }}>Register</h2>
+      <h2 style={{ color: '#2a7ae2', marginBottom: 24 }}>{t('register.title')}</h2>
       <form onSubmit={handleSubmit} style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 16 }}>
         <div style={{ width: '100%' }}>
           <input
             type="text"
-            placeholder="Name"
+            placeholder={t('register.nameLabel')}
             value={name}
             onChange={e => setName(e.target.value)}
             style={{ width: '100%', padding: '10px', borderRadius: 6, border: fieldErrors.name ? '1.5px solid #e53e3e' : '1px solid #bbb' }}
@@ -75,7 +77,7 @@ export default function Register() {
         <div style={{ width: '100%' }}>
           <input
             type="email"
-            placeholder="Email"
+            placeholder={t('register.emailLabel')}
             value={email}
             onChange={e => setEmail(e.target.value)}
             style={{ width: '100%', padding: '10px', borderRadius: 6, border: fieldErrors.email ? '1.5px solid #e53e3e' : '1px solid #bbb' }}
@@ -86,7 +88,7 @@ export default function Register() {
         <div style={{ width: '100%' }}>
           <input
             type="password"
-            placeholder="Password"
+            placeholder={t('register.passwordLabel')}
             value={password}
             onChange={e => setPassword(e.target.value)}
             style={{ width: '100%', padding: '10px', borderRadius: 6, border: fieldErrors.password ? '1.5px solid #e53e3e' : '1px solid #bbb' }}
@@ -114,9 +116,9 @@ export default function Register() {
             style={{ marginTop: '4px', cursor: 'pointer' }}
           />
           <label htmlFor="agreePrivacy" style={{ cursor: 'pointer', fontSize: '0.95rem', color: '#333' }}>
-            I accept the{' '}
+            {t('register.acceptPrivacy')}{' '}
             <Link href="/privacy-policy" style={{ color: '#2a7ae2', textDecoration: 'underline' }}>
-              Privacy Policy
+              {t('home.privacyPolicy')}
             </Link>
           </label>
         </div>
@@ -141,9 +143,9 @@ export default function Register() {
             style={{ marginTop: '4px', cursor: 'pointer' }}
           />
           <label htmlFor="agreeTerms" style={{ cursor: 'pointer', fontSize: '0.95rem', color: '#333' }}>
-            I accept the{' '}
+            {t('register.acceptTerms')}{' '}
             <Link href="/terms-of-service" style={{ color: '#2a7ae2', textDecoration: 'underline' }}>
-              Terms of Service
+              {t('home.termsOfService')}
             </Link>
           </label>
         </div>
@@ -164,13 +166,13 @@ export default function Register() {
           }}
           disabled={loading}
         >
-          {loading ? 'Registering...' : 'Register'}
+          {loading ? t('messages.loading') : t('register.registerButton')}
         </button>
       </form>
       {error && <p style={{ color: '#e53e3e', marginTop: 16 }}>{error}</p>}
       {success && <p style={{ color: '#38a169', marginTop: 16 }}>{success}</p>}
       <Link href="/" style={{ marginTop: 24, color: '#2a7ae2', textDecoration: 'underline', fontWeight: 'bold', fontSize: '1rem' }}>
-        Go back home
+        {t('nav.home')}
       </Link>
     </div>
   );

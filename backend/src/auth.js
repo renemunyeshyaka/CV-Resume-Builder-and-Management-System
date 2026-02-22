@@ -285,7 +285,7 @@ router.get('/me', authenticateToken, async (req, res) => {
 
 // Update user profile
 router.put('/profile', authenticateToken, async (req, res) => {
-  const { name, phone, location, occupation, bio, profile_picture, signature } = req.body;
+  const { name, phone, location, occupation, bio, profile_picture, signature, preferred_language } = req.body;
   
   try {
     // Build dynamic update query based on provided fields
@@ -321,6 +321,10 @@ router.put('/profile', authenticateToken, async (req, res) => {
       updates.push(`signature = $${paramCount++}`);
       values.push(signature);
     }
+    if (preferred_language !== undefined) {
+      updates.push(`preferred_language = $${paramCount++}`);
+      values.push(preferred_language);
+    }
 
     if (updates.length === 0) {
       return res.status(400).json({ error: 'No fields to update' });
@@ -333,7 +337,7 @@ router.put('/profile', authenticateToken, async (req, res) => {
       UPDATE users 
       SET ${updates.join(', ')} 
       WHERE id = $${paramCount}
-      RETURNING id, email, name, phone, location, occupation, bio, profile_picture, signature, role, created_at
+      RETURNING id, email, name, phone, location, occupation, bio, profile_picture, signature, preferred_language, role, created_at
     `;
 
     const result = await pool.query(query, values);

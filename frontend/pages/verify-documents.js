@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export default function VerifyDocuments() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { cvId } = router.query;
   const [cvs, setCvs] = useState([]);
   const [selectedCV, setSelectedCV] = useState(null);
@@ -43,14 +45,14 @@ export default function VerifyDocuments() {
       setLoading(false);
     } catch (err) {
       console.error('Error fetching CVs:', err);
-      setError('Failed to load CVs for verification');
+      setError(t('verifyDocs.loadError'));
       setLoading(false);
     }
   };
 
   const handleVerifyCV = async () => {
     if (!selectedCV) {
-      setError('Please select a CV to verify');
+      setError(t('verifyDocs.selectCvPrompt'));
       return;
     }
 
@@ -75,7 +77,7 @@ export default function VerifyDocuments() {
       });
     } catch (err) {
       console.error('Verification error:', err);
-      setError(err.response?.data?.message || 'Verification failed');
+      setError(err.response?.data?.message || t('verify.error'));
     } finally {
       setVerifying(false);
     }
@@ -84,7 +86,7 @@ export default function VerifyDocuments() {
   if (loading) {
     return (
       <div style={{ padding: '40px', textAlign: 'center', minHeight: '100vh' }}>
-        <p>Loading...</p>
+        <p>{t('verifyDocs.loading')}</p>
       </div>
     );
   }
@@ -95,12 +97,12 @@ export default function VerifyDocuments() {
         {/* Header */}
         <div style={{ marginBottom: '30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px' }}>
           <div>
-            <h1 style={{ fontSize: '32px', fontWeight: '700', color: '#333', margin: '0' }}>Verify Documents</h1>
-            <p style={{ color: '#666', margin: '5px 0 0 0' }}>Check authenticity of submitted CVs</p>
+            <h1 style={{ fontSize: '32px', fontWeight: '700', color: '#333', margin: '0' }}>{t('verifyDocs.title')}</h1>
+            <p style={{ color: '#666', margin: '5px 0 0 0' }}>{t('verifyDocs.subtitle')}</p>
           </div>
           <Link href="/hr-dashboard">
             <button style={{ padding: '10px 20px', background: '#667eea', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}>
-              Back to Dashboard
+              {t('verifyDocs.backToDashboard')}
             </button>
           </Link>
         </div>
@@ -114,9 +116,9 @@ export default function VerifyDocuments() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
           {/* CV Selection Panel */}
           <div style={{ background: 'white', padding: '20px', borderRadius: '10px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
-            <h2 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '15px', color: '#333' }}>Select CV to Verify</h2>
+            <h2 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '15px', color: '#333' }}>{t('verifyDocs.selectCvTitle')}</h2>
             {cvs.length === 0 ? (
-              <p style={{ color: '#666' }}>No CVs available for verification</p>
+              <p style={{ color: '#666' }}>{t('verifyDocs.noCvs')}</p>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 {cvs.map((cv) => (
@@ -144,7 +146,7 @@ export default function VerifyDocuments() {
                   >
                     <p style={{ margin: '0 0 5px 0', fontWeight: 'bold', fontSize: '14px' }}>📄 {cv.title}</p>
                     <p style={{ margin: '0 0 3px 0', fontSize: '12px', color: '#666' }}>
-                      User: {cv.user_name || cv.user_email}
+                      {t('verifyDocs.userLabel')}: {cv.user_name || cv.user_email}
                     </p>
                     <p style={{ margin: '0', fontSize: '12px', color: '#999' }}>
                       {new Date(cv.created_at).toLocaleDateString()}
@@ -157,21 +159,21 @@ export default function VerifyDocuments() {
 
           {/* Verification Form */}
           <div style={{ background: 'white', padding: '20px', borderRadius: '10px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
-            <h2 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '15px', color: '#333' }}>Verification Details</h2>
+            <h2 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '15px', color: '#333' }}>{t('verifyDocs.verificationDetails')}</h2>
             {selectedCV ? (
               <>
                 <div style={{ marginBottom: '20px', padding: '15px', background: '#f9f9f9', borderRadius: '5px' }}>
                   <p style={{ margin: '0 0 8px 0', fontSize: '14px' }}>
-                    <strong>CV Title:</strong> {selectedCV.title}
+                    <strong>{t('verifyDocs.cvTitleLabel')}:</strong> {selectedCV.title}
                   </p>
                   <p style={{ margin: '0 0 8px 0', fontSize: '14px' }}>
-                    <strong>User:</strong> {selectedCV.user_name || selectedCV.user_email}
+                    <strong>{t('verifyDocs.userLabel')}:</strong> {selectedCV.user_name || selectedCV.user_email}
                   </p>
                   <p style={{ margin: '0 0 8px 0', fontSize: '14px' }}>
-                    <strong>Created:</strong> {new Date(selectedCV.created_at).toLocaleString()}
+                    <strong>{t('verifyDocs.createdLabel')}:</strong> {new Date(selectedCV.created_at).toLocaleString()}
                   </p>
                   <p style={{ margin: '0', fontSize: '14px' }}>
-                    <strong>Status:</strong> {' '}
+                    <strong>{t('verifyDocs.statusLabel')}:</strong>{' '}
                     <span style={{
                       padding: '3px 8px',
                       borderRadius: '15px',
@@ -179,18 +181,18 @@ export default function VerifyDocuments() {
                       background: selectedCV.status === 'verified' ? '#d4edda' : '#fff3cd',
                       color: selectedCV.status === 'verified' ? '#155724' : '#856404'
                     }}>
-                      {selectedCV.status === 'verified' ? '✓ Verified' : '⏳ Pending'}
+                      {selectedCV.status === 'verified' ? t('verifyDocs.statusVerified') : t('verifyDocs.statusPending')}
                     </span>
                   </p>
                 </div>
 
                 <div style={{ marginBottom: '20px' }}>
                   <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#333', fontSize: '14px' }}>
-                    QR Code (Optional):
+                    {t('verifyDocs.qrLabel')}
                   </label>
                   <input
                     type="text"
-                    placeholder="Paste QR code data or leave empty"
+                    placeholder={t('verifyDocs.qrPlaceholder')}
                     value={qrInput}
                     onChange={(e) => setQrInput(e.target.value)}
                     style={{
@@ -226,12 +228,12 @@ export default function VerifyDocuments() {
                     if (!verifying) e.target.style.background = '#28a745';
                   }}
                 >
-                  {verifying ? '⏳ Verifying...' : '✓ Verify Document'}
+                  {verifying ? t('verifyDocs.verifying') : t('verifyDocs.verifyButton')}
                 </button>
               </>
             ) : (
               <p style={{ color: '#666', textAlign: 'center', padding: '20px' }}>
-                Select a CV to verify
+                {t('verifyDocs.selectCvPrompt')}
               </p>
             )}
           </div>
@@ -248,7 +250,7 @@ export default function VerifyDocuments() {
               color: verificationResult.isAuthentic ? '#155724' : '#721c24'
             }}>
               <h2 style={{ margin: '0 0 15px 0', fontSize: '22px', fontWeight: 'bold' }}>
-                {verificationResult.isAuthentic ? '✓ Document Verified' : '✗ Verification Failed'}
+                {verificationResult.isAuthentic ? t('verifyDocs.resultVerified') : t('verifyDocs.resultFailed')}
               </h2>
               <p style={{ margin: '0 0 15px 0', fontSize: '16px' }}>
                 {verificationResult.message}

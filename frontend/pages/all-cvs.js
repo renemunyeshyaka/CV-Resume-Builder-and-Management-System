@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export default function AllCvs() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [cvs, setCvs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -33,7 +35,7 @@ export default function AllCvs() {
       setLoading(false);
     } catch (err) {
       console.error('Error fetching CVs:', err);
-      setError('Failed to load CVs');
+      setError(t('allCvs.loadError'));
       setLoading(false);
     }
   };
@@ -59,7 +61,7 @@ export default function AllCvs() {
   if (loading) {
     return (
       <div style={{ padding: '40px', textAlign: 'center', minHeight: '100vh' }}>
-        <p>Loading CVs...</p>
+        <p>{t('allCvs.loading')}</p>
       </div>
     );
   }
@@ -70,12 +72,12 @@ export default function AllCvs() {
         {/* Header */}
         <div style={{ marginBottom: '30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px' }}>
           <div>
-            <h1 style={{ fontSize: '32px', fontWeight: '700', color: '#333', margin: '0' }}>All Submitted CVs</h1>
-            <p style={{ color: '#666', margin: '5px 0 0 0' }}>Total CVs: {filteredCvs.length}</p>
+            <h1 style={{ fontSize: '32px', fontWeight: '700', color: '#333', margin: '0' }}>{t('allCvs.title')}</h1>
+            <p style={{ color: '#666', margin: '5px 0 0 0' }}>{t('allCvs.totalLabel')}: {filteredCvs.length}</p>
           </div>
           <Link href="/hr-dashboard">
             <button style={{ padding: '10px 20px', background: '#667eea', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}>
-              Back to Dashboard
+              {t('allCvs.backToDashboard')}
             </button>
           </Link>
         </div>
@@ -90,10 +92,10 @@ export default function AllCvs() {
         <div style={{ background: 'white', padding: '20px', borderRadius: '10px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)', marginBottom: '30px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '15px' }}>
             <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#333' }}>Search:</label>
+              <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#333' }}>{t('allCvs.searchLabel')}</label>
               <input 
                 type="text" 
-                placeholder="Search by CV title, user name, or email..." 
+                placeholder={t('allCvs.searchPlaceholder')} 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 style={{
@@ -107,7 +109,7 @@ export default function AllCvs() {
               />
             </div>
             <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#333' }}>Filter by Status:</label>
+              <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', color: '#333' }}>{t('allCvs.filterLabel')}</label>
               <select 
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
@@ -120,9 +122,9 @@ export default function AllCvs() {
                   boxSizing: 'border-box'
                 }}
               >
-                <option value="all">All CVs</option>
-                <option value="verified">Verified</option>
-                <option value="pending">Pending Review</option>
+                <option value="all">{t('allCvs.filterAll')}</option>
+                <option value="verified">{t('allCvs.filterVerified')}</option>
+                <option value="pending">{t('allCvs.filterPending')}</option>
               </select>
             </div>
           </div>
@@ -131,7 +133,7 @@ export default function AllCvs() {
         {/* CVs Grid */}
         {filteredCvs.length === 0 ? (
           <div style={{ background: 'white', padding: '40px', borderRadius: '10px', textAlign: 'center', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
-            <p style={{ color: '#666', fontSize: '16px' }}>No CVs found matching your criteria</p>
+            <p style={{ color: '#666', fontSize: '16px' }}>{t('allCvs.empty')}</p>
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '20px' }}>
@@ -160,20 +162,20 @@ export default function AllCvs() {
                 {/* Card Header */}
                 <div style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', padding: '20px', color: 'white' }}>
                   <h3 style={{ margin: '0 0 5px 0', fontSize: '18px', fontWeight: 'bold' }}>{cv.title}</h3>
-                  <p style={{ margin: '0', opacity: 0.9, fontSize: '14px' }}>by {cv.user_name || cv.user_email}</p>
+                  <p style={{ margin: '0', opacity: 0.9, fontSize: '14px' }}>{t('allCvs.byLabel')} {cv.user_name || cv.user_email}</p>
                 </div>
 
                 {/* Card Body */}
                 <div style={{ padding: '20px' }}>
                   <div style={{ marginBottom: '15px' }}>
                     <p style={{ margin: '0 0 5px 0', fontSize: '13px', color: '#666' }}>
-                      <strong>Email:</strong> {cv.user_email}
+                      <strong>{t('allCvs.emailLabel')}:</strong> {cv.user_email}
                     </p>
                     <p style={{ margin: '0 0 5px 0', fontSize: '13px', color: '#666' }}>
-                      <strong>Created:</strong> {new Date(cv.created_at).toLocaleDateString()}
+                      <strong>{t('allCvs.createdLabel')}:</strong> {new Date(cv.created_at).toLocaleDateString()}
                     </p>
                     <p style={{ margin: '0 0 5px 0', fontSize: '13px', color: '#666' }}>
-                      <strong>Version:</strong> {cv.version || 1}
+                      <strong>{t('allCvs.versionLabel')}:</strong> {cv.version || 1}
                     </p>
                     <p style={{ margin: '0', fontSize: '13px' }}>
                       <span style={{
@@ -185,7 +187,7 @@ export default function AllCvs() {
                         background: cv.status === 'verified' ? '#d4edda' : '#fff3cd',
                         color: cv.status === 'verified' ? '#155724' : '#856404'
                       }}>
-                        {cv.status === 'verified' ? '✓ Verified' : '⏳ Pending'}
+                        {cv.status === 'verified' ? t('allCvs.statusVerified') : t('allCvs.statusPending')}
                       </span>
                     </p>
                   </div>
@@ -208,7 +210,7 @@ export default function AllCvs() {
                       onMouseEnter={(e) => e.target.style.background = '#5568d3'}
                       onMouseLeave={(e) => e.target.style.background = '#667eea'}
                     >
-                      👁️ Preview
+                      👁️ {t('allCvs.preview')}
                     </button>
                     <button
                       onClick={() => handleVerify(cv.id)}
@@ -226,7 +228,7 @@ export default function AllCvs() {
                       onMouseEnter={(e) => e.target.style.background = '#218838'}
                       onMouseLeave={(e) => e.target.style.background = '#28a745'}
                     >
-                      ✓ Verify
+                      ✓ {t('allCvs.verify')}
                     </button>
                   </div>
                 </div>
